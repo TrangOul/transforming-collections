@@ -80,7 +80,7 @@ class KeyTransformingDictBaseTestMixin:
 		
 		self.assertIn(self.KEY_TRANSFORMED, d, "transformed key not found in dict")
 		self.assertIn(transformer(self.KEY_UNTRANSFORMED), d, "key transformed by other dict not found in dict")
-		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
+		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key not found in dict keys")
 		self.assertNotIn(transformer(self.KEY_UNTRANSFORMED), keys, "key transformed by other dict found in dict keys")
 	
 	
@@ -301,7 +301,7 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertEqual(len(ld), 1, "dict should have one key")
 		self.assertIn(self.KEY_TRANSFORMED, ld, "transformed key not found in dict")
 		self.assertIn(transformer(self.KEY_UNTRANSFORMED), ld, "key transformed by other dict not found in dict")
-		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
+		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key not found in dict keys")
 		self.assertNotIn(transformer(self.KEY_UNTRANSFORMED), keys, "key transformed by other dict found in dict keys")
 	
 	
