@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .key_transforming_dict import BaseKeyTransformingDict, KeyTransformingDict
+from .key_transforming_dict import KeyTransformingDict
 
 class LowercaseDict(KeyTransformingDict):
 	@staticmethod
@@ -19,6 +19,5 @@ class UnicaseDict(KeyTransformingDict):
 __all__ = [
 	'LowercaseDict',
 	'UnicaseDict',
-	'BaseKeyTransformingDict',
 	'KeyTransformingDict',
 ]

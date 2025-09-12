@@ -4,65 +4,6 @@ import collections
 import abc
 import typing
 
-class BaseKeyTransformingDict(collections.UserDict[object, object]):
-	"""
-	Dictionary that transforms keys before using them in any operation.
-	Requires subclassing and implementing the key transformation function.
-	"""
-	@staticmethod
-	@abc.abstractmethod
-	def transform_key(key: object) -> object:
-		"""
-		Function that transforms the key before it is used in any operation.
-		It must be idempotent, i.e. subsequent calls with the same key
-		must return the same result.
-		"""
-		raise NotImplementedError
-	
-	@typing.override
-	def __contains__(self, key: object) -> bool:
-		key = self.transform_key(key)
-		return super().__contains__(key)
-	
-	@typing.override
-	def __getitem__(self, key: object) -> object:
-		key = self.transform_key(key)
-		return super().__getitem__(key)
-	
-	@typing.override
-	def __setitem__(self, key: object, value: object) -> None:
-		key = self.transform_key(key)
-		super().__setitem__(key, value)
-	
-	@typing.override
-	def __delitem__(self, key: object) -> None:
-		key = self.transform_key(key)
-		super().__delitem__(key)
-	
-	@typing.override
-	def __or__(self, other: object) -> typing.Self:
-		if not isinstance(other, collections.abc.Mapping):
-			return NotImplemented
-		new = type(self)(self)
-		new.update(other)
-		return new
-	
-	@typing.override
-	def __ror__(self, other: object) -> typing.Self:
-		if not isinstance(other, collections.abc.Mapping):
-			return NotImplemented
-		new = type(self)(other)
-		new.update(self)
-		return new
-	
-	@typing.override
-	def __ior__(self, other: object) -> typing.Self:
-		if not isinstance(other, collections.abc.Mapping):
-			return NotImplemented
-		self.update(other)
-		return self
-
-
 
 class KeyTransformingDict(collections.UserDict):
 	"""
@@ -72,6 +13,7 @@ class KeyTransformingDict(collections.UserDict):
 	Best for cases where transforming a key is an expensive operation.
 	"""
 	class KeysView(collections.abc.KeysView):
+		# TODO original keys
 		@typing.override
 		def __contains__(self, key):
 			return key in self._mapping
@@ -165,12 +107,15 @@ class KeyTransformingDict(collections.UserDict):
 			return NotImplemented
 		self.update(other)
 		return self
-
+	
+	@property
+	def _dict(self):
+		return {key: item[1] for key, item in self.data.items()}
 	
 	def _contains_without_transform(self, key: object) -> bool:
 		return super().__contains__(key)
 	
-	def _getitem_without_transform(self, key: object) -> object:
+	def _getitem_without_transform(self, key: object) -> tuple[object, object]:
 		return super().__getitem__(key)
 	
 	def _setitem_without_transform(self, transformed_key: object, original_key: object, value: object) -> None:
@@ -220,9 +165,8 @@ class KeyTransformingDict(collections.UserDict):
 	
 	@typing.override
 	def update(self, other=(), /, **kwds):
-		print(f"Updating with {other} ({type(other)}), {kwds}")
 		if isinstance(other, type(self)):
-			for key in other:
+			for key in other.data:
 				original_key, value = other._getitem_without_transform(key)
 				self._setitem_without_transform(key, original_key, value)
 			if kwds:
@@ -235,10 +179,13 @@ class KeyTransformingDict(collections.UserDict):
 		if isinstance(other, type(self)):
 			return self.data == other.data
 		if isinstance(other, collections.UserDict):
-			return self.data == other.data
+			return self._dict == other.data
 		if isinstance(other, collections.abc.Mapping):
-			return self.data == dict(other.items())
+			return self._dict == dict(other.items())
 		return NotImplemented
+	
+	def __iter__(self):
+		return (v[0] for v in self.data.values())
 	
 	@typing.override
 	def items(self) -> collections.abc.ItemsView:

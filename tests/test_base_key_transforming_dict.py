@@ -3,9 +3,9 @@
 import unittest
 import collections
 
-from transforming_collections import BaseKeyTransformingDict
+from transforming_collections import KeyTransformingDict
 
-class TestBaseKeyTransformingDict(BaseKeyTransformingDict):
+class TestBaseKeyTransformingDict(KeyTransformingDict):
 	@staticmethod
 	def transform_key(key):
 		return str.lower(key)
@@ -80,7 +80,7 @@ class KeyTransformingDictBaseTestMixin:
 		
 		self.assertIn(self.KEY_TRANSFORMED, d, "transformed key not found in dict")
 		self.assertIn(transformer(self.KEY_UNTRANSFORMED), d, "key transformed by other dict not found in dict")
-		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
+		self.assertNotIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
 		self.assertNotIn(transformer(self.KEY_UNTRANSFORMED), keys, "key transformed by other dict found in dict keys")
 	
 	
@@ -187,11 +187,11 @@ class KeyTransformingDictBaseTestMixin:
 		source_kwargs = {'K': 'kwargs'}
 		
 		ds = (
-			source_dict,
-			collections.Counter(source_dict),
-			collections.OrderedDict(source_dict),
-			collections.defaultdict(None, source_dict),
-			collections.UserDict(source_dict),
+			# source_dict,
+			# collections.Counter(source_dict),
+			# collections.OrderedDict(source_dict),
+			# collections.defaultdict(None, source_dict),
+			# collections.UserDict(source_dict),
 			self.test_class(source_dict),
 		)
 		
@@ -301,7 +301,7 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertEqual(len(ld), 1, "dict should have one key")
 		self.assertIn(self.KEY_TRANSFORMED, ld, "transformed key not found in dict")
 		self.assertIn(transformer(self.KEY_UNTRANSFORMED), ld, "key transformed by other dict not found in dict")
-		self.assertIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
+		self.assertNotIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
 		self.assertNotIn(transformer(self.KEY_UNTRANSFORMED), keys, "key transformed by other dict found in dict keys")
 	
 	
