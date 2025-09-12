@@ -63,20 +63,30 @@ class BaseKeyTransformingDict(collections.UserDict[object, object]):
 		return self
 
 
-class KeyTransformingDict(BaseKeyTransformingDict):
+
+class KeyTransformingDict(collections.UserDict):
 	"""
 	Dictionary that transforms keys before using them in any operation.
 	Requires subclassing and implementing the key transformation function.
 	Optimized so keys are transformed only when necessary, and without repeated redundant transformations.
 	Best for cases where transforming a key is an expensive operation.
 	"""
+	class KeysView(collections.abc.KeysView):
+		@typing.override
+		def __contains__(self, key):
+			return key in self._mapping
+		
+		@typing.override
+		def __iter__(self):
+			yield from self._mapping
+	
 	class ItemsView(collections.abc.ItemsView):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
 			key, value = item
 			key = self._mapping.transform_key(key)
 			try:
-				v = self._mapping._getitem_without_transform(key)
+				v = self._mapping._getitem_without_transform(key)[1]
 			except KeyError:
 				return False
 			else:
@@ -85,13 +95,13 @@ class KeyTransformingDict(BaseKeyTransformingDict):
 		@typing.override
 		def __iter__(self):
 			for key in self._mapping:
-				yield (key, self._mapping._getitem_without_transform(key))
+				yield (key, self._mapping._getitem_without_transform(key)[1])
 	
 	class ValuesView(collections.abc.ValuesView):
 		@typing.override
 		def __contains__(self, value: object) -> bool:
 			for key in self._mapping:
-				v = self._mapping._getitem_without_transform(key)
+				v = self._mapping._getitem_without_transform(key)[1]
 				if v is value or v == value:
 					return True
 			return False
@@ -99,34 +109,88 @@ class KeyTransformingDict(BaseKeyTransformingDict):
 		@typing.override
 		def __iter__(self):
 			for key in self._mapping:
-				yield self._mapping._getitem_without_transform(key)
+				yield self._mapping._getitem_without_transform(key)[1]
 	
 	__marker = object()
 	
+	@staticmethod
+	@abc.abstractmethod
+	def transform_key(key: object) -> object:
+		"""
+		Function that transforms the key before it is used in any operation.
+		It must be idempotent, i.e. subsequent calls with the same key
+		must return the same result.
+		"""
+		raise NotImplementedError
+	
+	@typing.override
+	def __contains__(self, key: object) -> bool:
+		key = self.transform_key(key)
+		return self._contains_without_transform(key)
+	
+	@typing.override
+	def __getitem__(self, key: object) -> object:
+		key = self.transform_key(key)
+		return self._getitem_without_transform(key)[1]
+	
+	@typing.override
+	def __setitem__(self, key: object, value: object) -> None:
+		transformed_key = self.transform_key(key)
+		return self._setitem_without_transform(transformed_key, key, value)
+	
+	@typing.override
+	def __delitem__(self, key: object) -> None:
+		key = self.transform_key(key)
+		return self._delitem_without_transform(key)
+	
+	@typing.override
+	def __or__(self, other: object) -> typing.Self:
+		if not isinstance(other, collections.abc.Mapping):
+			return NotImplemented
+		new = type(self)(self)
+		new.update(other)
+		return new
+	
+	@typing.override
+	def __ror__(self, other: object) -> typing.Self:
+		if not isinstance(other, collections.abc.Mapping):
+			return NotImplemented
+		new = type(self)(other)
+		new.update(self)
+		return new
+	
+	@typing.override
+	def __ior__(self, other: object) -> typing.Self:
+		if not isinstance(other, collections.abc.Mapping):
+			return NotImplemented
+		self.update(other)
+		return self
+
+	
 	def _contains_without_transform(self, key: object) -> bool:
-		return super(BaseKeyTransformingDict, self).__contains__(key)
+		return super().__contains__(key)
 	
 	def _getitem_without_transform(self, key: object) -> object:
-		return super(BaseKeyTransformingDict, self).__getitem__(key)
+		return super().__getitem__(key)
 	
-	def _setitem_without_transform(self, key: object, value: object) -> None:
-		super(BaseKeyTransformingDict, self).__setitem__(key, value)
+	def _setitem_without_transform(self, transformed_key: object, original_key: object, value: object) -> None:
+		super().__setitem__(transformed_key, (original_key, value))
 	
 	def _delitem_without_transform(self, key: object) -> None:
-		super(BaseKeyTransformingDict, self).__delitem__(key)
+		super().__delitem__(key)
 	
 	@typing.override
 	def get(self, key: object, default: object=None) -> object:
 		key = self.transform_key(key)
 		if self._contains_without_transform(key):
-			return self._getitem_without_transform(key)
+			return self._getitem_without_transform(key)[1]
 		return default
 	
 	@typing.override
 	def pop(self, key:object, default: object=__marker) -> object:
 		key = self.transform_key(key)
 		try:
-			value = self._getitem_without_transform(key)
+			value = self._getitem_without_transform(key)[1]
 		except KeyError:
 			if default is self.__marker:
 				raise
@@ -141,27 +205,28 @@ class KeyTransformingDict(BaseKeyTransformingDict):
 			key = next(iter(self))
 		except StopIteration:
 			raise KeyError from None
-		value = self._getitem_without_transform(key)
+		original_key, value = self._getitem_without_transform(key)
 		self._delitem_without_transform(key)
-		return key, value
+		return original_key, value
 	
 	@typing.override
 	def setdefault(self, key: object, default: object=None) -> object:
-		key = self.transform_key(key)
+		transformed_key = self.transform_key(key)
 		try:
-			return self._getitem_without_transform(key)
+			return self._getitem_without_transform(transformed_key)[1]
 		except KeyError:
-			self._setitem_without_transform(key, default)
+			self._setitem_without_transform(transformed_key, key, default)
 		return default
 	
 	@typing.override
 	def update(self, other=(), /, **kwds):
+		print(f"Updating with {other} ({type(other)}), {kwds}")
 		if isinstance(other, type(self)):
 			for key in other:
-				value = other._getitem_without_transform(key)
-				self._setitem_without_transform(key, value)
+				original_key, value = other._getitem_without_transform(key)
+				self._setitem_without_transform(key, original_key, value)
 		else:
-			super(BaseKeyTransformingDict, self).update(other, **kwds)
+			super().update(other, **kwds)
 	
 	@typing.override
 	def __eq__(self, other: object) -> bool:
