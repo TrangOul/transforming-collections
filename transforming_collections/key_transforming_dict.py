@@ -160,8 +160,10 @@ class KeyTransformingDict(BaseKeyTransformingDict):
 			for key in other:
 				value = other._getitem_without_transform(key)
 				self._setitem_without_transform(key, value)
+			if kwds:
+				super().update(**kwds)
 		else:
-			super(BaseKeyTransformingDict, self).update(other, **kwds)
+			super().update(other, **kwds)
 	
 	@typing.override
 	def __eq__(self, other: object) -> bool:
