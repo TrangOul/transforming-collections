@@ -225,6 +225,8 @@ class KeyTransformingDict(collections.UserDict):
 			for key in other:
 				original_key, value = other._getitem_without_transform(key)
 				self._setitem_without_transform(key, original_key, value)
+			if kwds:
+				super().update(**kwds)
 		else:
 			super().update(other, **kwds)
 	
