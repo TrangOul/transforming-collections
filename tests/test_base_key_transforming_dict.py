@@ -86,12 +86,21 @@ class KeyTransformingDictBaseTestMixin:
 	
 	def test_init_dict_transform_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed'}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+		)
 		
-		d = self.test_class(source_dict)
-		
-		self.assertEqual(len(d), 1, "dict should have one key")
-		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d = self.test_class(d2)
+				
+				self.assertEqual(len(d), 1, "dict should have one key")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
+				self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
 	
 	def test_init_list_transform_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED, 'untransformed']]
@@ -114,15 +123,24 @@ class KeyTransformingDictBaseTestMixin:
 	
 	def test_init_dict_overwrite_untransformed_by_transformed(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed', self.KEY_TRANSFORMED: 'transformed'}
-		self.assertEqual(len(source_dict), 2)
-		self.assertEqual(list(source_dict), [self.KEY_UNTRANSFORMED, self.KEY_TRANSFORMED], 'dict keys not in expected order')
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+		)
 		
-		d = self.test_class(source_dict)
-		
-		self.assertEqual(len(d), 1, "dict should have one key")
-		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
-		self.assertEqual(d[self.KEY_TRANSFORMED], 'transformed', "transformed key value not overwritten")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				self.assertEqual(list(d2), [self.KEY_UNTRANSFORMED, self.KEY_TRANSFORMED], 'dict keys not in expected order')
+				
+				d = self.test_class(d2)
+				
+				self.assertEqual(len(d), 1, "dict should have one key")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
+				self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
+				self.assertEqual(d[self.KEY_TRANSFORMED], 'transformed', "transformed key value not overwritten")
 	
 	def test_init_list_overwrite_untransformed_by_transformed(self):
 		source_list = [[self.KEY_UNTRANSFORMED, 'untransformed'], [self.KEY_TRANSFORMED, 'transformed']]
@@ -149,15 +167,24 @@ class KeyTransformingDictBaseTestMixin:
 	
 	def test_init_dict_overwrite_transformed_by_untransformed(self):
 		source_dict = {self.KEY_TRANSFORMED: 'transformed', self.KEY_UNTRANSFORMED: 'untransformed'}
-		self.assertEqual(len(source_dict), 2)
-		self.assertEqual(list(source_dict), [self.KEY_TRANSFORMED, self.KEY_UNTRANSFORMED], 'dict keys not in expected order')
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+		)
 		
-		d = self.test_class(source_dict)
-		
-		self.assertEqual(len(d), 1, "dict should have one key")
-		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
-		self.assertEqual(d[self.KEY_TRANSFORMED], 'untransformed', "transformed key value not overwritten")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				self.assertEqual(list(d2), [self.KEY_TRANSFORMED, self.KEY_UNTRANSFORMED], 'dict keys not in expected order')
+				
+				d = self.test_class(d2)
+				
+				self.assertEqual(len(d), 1, "dict should have one key")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
+				self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
+				self.assertEqual(d[self.KEY_TRANSFORMED], 'untransformed', "transformed key value not overwritten")
 
 	def test_init_list_overwrite_transformed_by_untransformed(self):
 		source_list = [[self.KEY_TRANSFORMED, 'transformed'], [self.KEY_UNTRANSFORMED, 'untransformed']]
@@ -183,8 +210,8 @@ class KeyTransformingDictBaseTestMixin:
 	
 	
 	def test_init_dict_kwargs_add_both(self):
-		source_dict   = {'D': 'dict'}
-		source_kwargs = {'K': 'kwargs'}
+		source_dict   = {self.KEY_UNTRANSFORMED: 'dict'}
+		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
 		
 		ds = (
 			source_dict,
@@ -200,22 +227,22 @@ class KeyTransformingDictBaseTestMixin:
 				d = self.test_class(d2, **source_kwargs)
 				
 				self.assertEqual(len(d), 2, "dict should have both keys")
-				self.assertIn('D', d, "untransformed key from dict not found")
-				self.assertIn('d', d,   "transformed key from dict not found")
-				self.assertIn('K', d, "untransformed key from kwargs not found")
-				self.assertIn('k', d,   "transformed key from kwargs not found")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from dict not found")
+				self.assertIn(self.KEY_TRANSFORMED, d,   "transformed key from dict not found")
+				self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key from kwargs not found")
+				self.assertIn(self.KEY_TRANSFORMED_2, d,   "transformed key from kwargs not found")
 		
 	def test_init_list_kwargs_add_both(self):
-		source_list   = [['L', 'dict']]
-		source_kwargs = {'K': 'kwargs'}
+		source_list   = [[self.KEY_UNTRANSFORMED, 'dict']]
+		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
 		
 		d = self.test_class(source_list, **source_kwargs)
 		
 		self.assertEqual(len(d), 2, "dict should have both keys")
-		self.assertIn('L', d, "untransformed key from list not found")
-		self.assertIn('l', d,   "transformed key from list not found")
-		self.assertIn('K', d, "untransformed key from kwargs not found")
-		self.assertIn('k', d,   "transformed key from kwargs not found")
+		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from list not found")
+		self.assertIn(self.KEY_TRANSFORMED, d,   "transformed key from list not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key from kwargs not found")
+		self.assertIn(self.KEY_TRANSFORMED_2, d,   "transformed key from kwargs not found")
 	
 	
 	def test_init_dict_kwargs_overwrite_untransformed_by_transformed(self):
@@ -307,13 +334,24 @@ class KeyTransformingDictBaseTestMixin:
 	
 	def test_update_dict_transform_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed'}
-		d = self.test_class()
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
 		
-		d.update(source_dict)
-		
-		self.assertEqual(len(d), 1, "dict should have one key")
-		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d = self.test_class()
+				
+				d.update(d2)
+				
+				self.assertEqual(len(d), 1, "dict should have one key")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
+				self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
 	
 	def test_update_list_transform_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED, 'untransformed']]
@@ -337,15 +375,26 @@ class KeyTransformingDictBaseTestMixin:
 	
 	
 	def test_update_dict_overwrite_transformed_by_untransformed(self):
-		d = self.test_class({self.KEY_TRANSFORMED: 'original'})
 		source_dict = {self.KEY_UNTRANSFORMED: 'dict'}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
 		
-		d.update(source_dict)
-		
-		self.assertEqual(len(d), 1, "dict should have one key")
-		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
-		self.assertEqual(d[self.KEY_TRANSFORMED], 'dict', "original key's value not overwritten by dict's untransformed key's value")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d = self.test_class({self.KEY_TRANSFORMED: 'original'})
+				
+				d.update(d2)
+				
+				self.assertEqual(len(d), 1, "dict should have one key")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
+				self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
+				self.assertEqual(d[self.KEY_TRANSFORMED], 'dict', "original key's value not overwritten by dict's untransformed key's value")
 	
 	def test_update_list_overwrite_transformed_by_untransformed(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 'original'})
@@ -371,45 +420,56 @@ class KeyTransformingDictBaseTestMixin:
 	
 	
 	def test_update_dict_add(self):
-		source_dict   = {'D': 'dict'}
-		d = self.test_class(O='original')
+		source_dict   = {self.KEY_UNTRANSFORMED: 'dict'}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
 		
-		d.update(source_dict)
-		
-		self.assertEqual(len(d), 2, "dict should have both keys")
-		self.assertIn('O', d, "untransformed original key not found")
-		self.assertIn('o', d,   "transformed original key not found")
-		self.assertIn('D', d, "untransformed key from dict not found")
-		self.assertIn('d', d,   "transformed key from dict not found")
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):	
+				d = self.test_class({self.KEY_UNTRANSFORMED_3: 'original'})
+				
+				d.update(d2)
+				
+				self.assertEqual(len(d), 2, "dict should have both keys")
+				self.assertIn(self.KEY_UNTRANSFORMED_3, d, "untransformed original key not found")
+				self.assertIn(self.KEY_TRANSFORMED_3, d,   "transformed original key not found")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from dict not found")
+				self.assertIn(self.KEY_TRANSFORMED, d,   "transformed key from dict not found")
 	
 	def test_update_list_add(self):
-		source_list   = [['L', 'dict']]
-		d = self.test_class(O='original')
+		source_list   = [[self.KEY_UNTRANSFORMED, 'dict']]
+		d = self.test_class({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(source_list)
 		
 		self.assertEqual(len(d), 2, "dict should have both keys")
-		self.assertIn('O', d, "untransformed original key not found")
-		self.assertIn('o', d,   "transformed original key not found")
-		self.assertIn('L', d, "untransformed key from list not found")
-		self.assertIn('l', d,   "transformed key from list not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_3, d, "untransformed original key not found")
+		self.assertIn(self.KEY_TRANSFORMED_3, d,   "transformed original key not found")
+		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from list not found")
+		self.assertIn(self.KEY_TRANSFORMED, d,   "transformed key from list not found")
 	
 	def test_update_kwargs_add(self):
-		source_kwargs   = {'K': 'kwargs'}
-		d = self.test_class(O='original')
+		source_kwargs   = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
+		d = self.test_class({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(**source_kwargs)
 		
 		self.assertEqual(len(d), 2, "dict should have both keys")
-		self.assertIn('O', d, "untransformed original key not found")
-		self.assertIn('o', d,   "transformed original key not found")
-		self.assertIn('K', d, "untransformed key from kwargs not found")
-		self.assertIn('k', d,   "transformed key from kwargs not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_3, d, "untransformed original key not found")
+		self.assertIn(self.KEY_TRANSFORMED_3, d,   "transformed original key not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key from kwargs not found")
+		self.assertIn(self.KEY_TRANSFORMED_2, d,   "transformed key from kwargs not found")
 	
 	
 	def test_update_dict_kwargs_add_both(self):
-		source_dict   = {'D': 'dict'}
-		source_kwargs = {'K': 'kwargs'}
+		source_dict   = {self.KEY_UNTRANSFORMED: 'dict'}
+		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
 		
 		ds = (
 			source_dict,
@@ -422,32 +482,32 @@ class KeyTransformingDictBaseTestMixin:
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = self.test_class(O='original')
+				d = self.test_class({self.KEY_UNTRANSFORMED_3: 'original'})
 				
 				d.update(d2, **source_kwargs)
 				
 				self.assertEqual(len(d), 3, "dict should have all three keys")
-				self.assertIn('O', d, "untransformed original key not found")
-				self.assertIn('o', d,   "transformed original key not found")
-				self.assertIn('D', d, "untransformed key from dict not found")
-				self.assertIn('d', d,   "transformed key from dict not found")
-				self.assertIn('K', d, "untransformed key from kwargs not found")
-				self.assertIn('k', d,   "transformed key from kwargs not found")
+				self.assertIn(self.KEY_UNTRANSFORMED_3, d, "untransformed original key not found")
+				self.assertIn(self.KEY_TRANSFORMED_3, d,   "transformed original key not found")
+				self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from dict not found")
+				self.assertIn(self.KEY_TRANSFORMED, d,   "transformed key from dict not found")
+				self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key from kwargs not found")
+				self.assertIn(self.KEY_TRANSFORMED_2, d,   "transformed key from kwargs not found")
 	
 	def test_update_list_kwargs_add_both(self):
-		source_list   = [['L', 'dict']]
-		source_kwargs = {'K': 'kwargs'}
-		d = self.test_class(O='original')
+		source_list   = [[self.KEY_UNTRANSFORMED, 'dict']]
+		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
+		d = self.test_class({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(source_list, **source_kwargs)
 		
 		self.assertEqual(len(d), 3, "dict should have all three keys")
-		self.assertIn('O', d, "untransformed original key not found")
-		self.assertIn('o', d,   "transformed original key not found")
-		self.assertIn('L', d, "untransformed key from list not found")
-		self.assertIn('l', d,   "transformed key from list not found")
-		self.assertIn('K', d, "untransformed key from kwargs not found")
-		self.assertIn('k', d,   "transformed key from kwargs not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_3, d, "untransformed original key not found")
+		self.assertIn(self.KEY_TRANSFORMED_3, d,   "transformed original key not found")
+		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key from list not found")
+		self.assertIn(self.KEY_UNTRANSFORMED, d,   "transformed key from list not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key from kwargs not found")
+		self.assertIn(self.KEY_TRANSFORMED_2, d,   "transformed key from kwargs not found")
 		
 		
 	def test_update_dict_kwargs_overwrite_untransformed_by_transformed(self):
