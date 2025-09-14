@@ -12,16 +12,6 @@ class KeyTransformingDict(collections.UserDict):
 	Optimized so keys are transformed only when necessary, and without repeated redundant transformations.
 	Best for cases where transforming a key is an expensive operation.
 	"""
-	class KeysView(collections.abc.KeysView):
-		# TODO original keys
-		@typing.override
-		def __contains__(self, key):
-			return key in self._mapping
-		
-		@typing.override
-		def __iter__(self):
-			yield from self._mapping
-	
 	class ItemsView(collections.abc.ItemsView):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
@@ -64,7 +54,16 @@ class KeyTransformingDict(collections.UserDict):
 		must return the same result.
 		"""
 		raise NotImplementedError
-	
+	'''
+	#TODO
+	def __init__(self, transform_key, replace_keys:bool=False, *args, **kwargs):
+		self.transform_key = transform_key
+		self.replace_keys = replace_keys
+		super().__init__(*args, **kwargs)
+	'''
+	@classmethod
+	def factory(cls, name: str, key_transformer):
+		return type( name, (cls,), { 'transform_key': staticmethod(key_transformer) } )
 	@typing.override
 	def __contains__(self, key: object) -> bool:
 		key = self.transform_key(key)

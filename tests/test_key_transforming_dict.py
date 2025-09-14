@@ -4,13 +4,7 @@ import unittest
 import unittest.mock
 import collections
 
-from transforming_collections import KeyTransformingDict
-from .test_base_key_transforming_dict import KeyTransformingDictBaseTestMixin
-
-class TestKeyTransformingDict(KeyTransformingDict):
-	@staticmethod
-	def transform_key(key):
-		return str.lower(key)
+from .test_base_key_transforming_dict import TestKeyTransformingDict, KeyTransformingDictBaseTestMixin
 
 class KeyTransformingDictPerformanceTestMixin:
 	def test_fromkeys_transform_once(self):
