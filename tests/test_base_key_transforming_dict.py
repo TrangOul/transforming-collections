@@ -68,10 +68,10 @@ class KeyTransformingDictBaseTestMixin:
 	
 	
 	def test_fromkeys_preserve_keys(self):
-		source_keys = (self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2)
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
 		
 		d = self.test_class.fromkeys(source_keys, 'fromkeys')
-		keys = tuple(d)
+		keys = set(d)
 		
 		self.assertEqual(keys, source_keys, "fromkeys should preserve original keys")
 	
@@ -84,10 +84,11 @@ class KeyTransformingDictBaseTestMixin:
 		source_dict = UppercaseKeyDict({self.KEY_UNTRANSFORMED: 'untransformed'})
 		
 		d = self.test_class(source_dict)
-		keys = tuple(d)
+		keys = set(d)
 		
 		self.assertIn(self.KEY_TRANSFORMED, d, "transformed key not found in dict")
 		self.assertIn(transformer(self.KEY_UNTRANSFORMED), d, "key transformed by other dict not found in dict")
+		self.assertIn(self.KEY_UNTRANSFORMED, keys, "untransformed key not found in dict keys")
 		self.assertNotIn(self.KEY_TRANSFORMED, keys, "transformed key found in dict keys")
 		self.assertNotIn(transformer(self.KEY_UNTRANSFORMED), keys, "key transformed by other dict found in dict keys")
 	
@@ -97,13 +98,13 @@ class KeyTransformingDictBaseTestMixin:
 			@staticmethod
 			def transform_key(key):
 				return transformer(key)
-		source_keys = (self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2)
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
 		source_dict = UppercaseKeyDict({key: 'value' for key in source_keys})
 		
 		d = self.test_class(source_dict)
-		keys = tuple(d)
+		keys = set(d)
 		
-		self.assertEqual(keys, source_keys, "fromkeys should preserve original keys")
+		self.assertEqual(keys, source_keys, "init should preserve original keys")
 	
 	
 	def test_init_dict_transform_key(self):
@@ -142,6 +143,42 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_UNTRANSFORMED, d, "untransformed key not found")
 		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
 	
+	
+	def test_init_dict_preserve_keys(self):
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
+		source_dict = {key: 'value' for key in source_keys}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d = self.test_class(d2)
+				keys = set(d)
+				
+				self.assertEqual(keys, source_keys, "init should preserve original keys")
+	
+	def test_init_list_preserve_keys(self):
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
+		source_list = [[key, 'value'] for key in source_keys]
+		
+		d = self.test_class(source_list)
+		keys = set(d)
+		
+		self.assertEqual(keys, source_keys, "init should preserve original keys")
+	
+	def test_init_kwargs_preserve_keys(self):
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
+		source_kwargs = {key: 'value' for key in source_keys}
+		
+		d = self.test_class(**source_kwargs)
+		keys = set(d)
+		
+		self.assertEqual(keys, source_keys, "init should preserve original keys")
 	
 	def test_init_dict_overwrite_untransformed_by_transformed(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed', self.KEY_TRANSFORMED: 'transformed'}
@@ -345,7 +382,7 @@ class KeyTransformingDictBaseTestMixin:
 		ud = UppercaseKeyDict({self.KEY_UNTRANSFORMED: 'untransformed2'})
 		
 		ld.update(ud)
-		keys = tuple(ld)
+		keys = set(ld)
 		
 		self.assertEqual(len(ld), 1, "dict should have one key")
 		self.assertIn(self.KEY_TRANSFORMED, ld, "transformed key not found in dict")
@@ -731,19 +768,21 @@ class KeyTransformingDictBaseTestMixin:
 	
 	
 	def test_iter(self):
-		d = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
+		d = self.test_class({key: 'value' for key in source_keys})
 		
-		keys = tuple(d)
+		keys = set(d)
 		
 		self.assertEqual(len(keys), 2, "iterating should yield all keys")
-		self.assertEqual(keys, [self.KEY_TRANSFORMED, self.KEY_TRANSFORMED_2], "transformed key not found in iteration")
-		# result is a standard Python list - no key normalization
-		self.assertNotIn(self.KEY_UNTRANSFORMED,   keys, "untransformed key found in iteration - iter should return transformed keys only")
-		self.assertNotIn(self.KEY_UNTRANSFORMED_2, keys, "untransformed key found in iteration - iter should return transformed keys only")
+		self.assertEqual(keys, source_keys, "transformed key not found in iteration")
+		self.assertIn(self.KEY_UNTRANSFORMED,    keys, "untransformed key not found in iteration - iter should return original keys only")
+		self.assertIn(self.KEY_UNTRANSFORMED_2,  keys, "untransformed key not found in iteration - iter should return original keys only")
+		self.assertNotIn(self.KEY_TRANSFORMED,   keys,   "transformed key found in iteration - iter should return original keys only")
+		self.assertNotIn(self.KEY_TRANSFORMED_2, keys,   "transformed key found in iteration - iter should return original keys only")
 	
 	def test_keys(self):
-		
-		d = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
+		source_keys = {self.KEY_UNTRANSFORMED, self.KEY_UNTRANSFORMED_2}
+		d = self.test_class({key: 'value' for key in source_keys})
 		
 		keys = d.keys()
 		
