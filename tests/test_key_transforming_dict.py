@@ -4,7 +4,9 @@ import unittest
 import unittest.mock
 import collections
 
-from .test_base_key_transforming_dict import TestKeyTransformingDict, KeyTransformingDictBaseTestMixin
+
+from tests.test_base_key_transforming_dict import TestKeyTransformingDict, KeyTransformingDictBaseTestMixin
+
 
 class KeyTransformingDictPerformanceTestMixin:
 	def test_fromkeys_transform_once(self):
@@ -47,7 +49,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			self.test_class(**source_kwargs)
 			transform_key_mock.assert_called_once()
 	
-	
 	def test_init_dict_transform_once_per_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed', self.KEY_TRANSFORMED: 'transformed'}
 		
@@ -68,7 +69,6 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			self.test_class(**source_kwargs)
 			self.assertEqual(transform_key_mock.call_count, len(source_kwargs), "transform_key should be called once for each key")
-	
 	
 	def test_init_same_class_kwargs_transform_once_per_key(self):
 		source_dict = self.test_class({self.KEY_UNTRANSFORMED: 'untransformed'})
@@ -94,7 +94,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			self.test_class(source_list, **source_kwargs)
 			self.assertEqual(transform_key_mock.call_count, len(source_list) + len(source_kwargs), "transform_key should be called once for each key")
 	
-	
 	def test_update_dict_transform_once(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'dict'}
 		d = self.test_class({self.KEY_TRANSFORMED: 'original'})
@@ -119,7 +118,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			d.update(**source_kwargs)
 			transform_key_mock.assert_called_once()
 	
-	
 	def test_update_dict_transform_once_per_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed', self.KEY_TRANSFORMED: 'transformed'}
 		d = self.test_class({self.KEY_TRANSFORMED: 'original'})
@@ -143,7 +141,6 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			d.update(**source_kwargs)
 			self.assertEqual(transform_key_mock.call_count, len(source_kwargs), "transform_key should be called once for each key")
-	
 	
 	def test_update_dict_kwargs_transform_once_per_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED: 'untransformed', self.KEY_TRANSFORMED: 'transformed'}
@@ -170,7 +167,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			len(d)
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for len")
 	
-	
 	def test_in_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
@@ -178,14 +174,12 @@ class KeyTransformingDictPerformanceTestMixin:
 			self.KEY_UNTRANSFORMED in d
 			transform_key_mock.assert_called_once()
 	
-	
 	def test_getitem_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			d[self.KEY_UNTRANSFORMED]
 			transform_key_mock.assert_called_once()
-	
 	
 	def test_get_present_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
@@ -201,7 +195,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			d.get(self.KEY_UNTRANSFORMED_2)
 			transform_key_mock.assert_called_once()
 	
-	
 	def test_setitem_transform_once(self):
 		d = self.test_class()
 		
@@ -209,21 +202,19 @@ class KeyTransformingDictPerformanceTestMixin:
 			d[self.KEY_UNTRANSFORMED] = 1
 			transform_key_mock.assert_called_once()
 	
-	
 	def test_delitem_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			del d[self.KEY_UNTRANSFORMED]
 			transform_key_mock.assert_called_once()
-		
+	
 	def test_pop_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			d.pop(self.KEY_UNTRANSFORMED)
 			transform_key_mock.assert_called_once()
-	
 	
 	def test_popitem_no_transforms(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
@@ -232,7 +223,6 @@ class KeyTransformingDictPerformanceTestMixin:
 			d.popitem()
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for popitem")
 	
-	
 	def test_clear_no_transforms(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
@@ -240,15 +230,13 @@ class KeyTransformingDictPerformanceTestMixin:
 			d.clear()
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not be called for clear")
 	
-	
 	def test_setdefault_missing_transform_once(self):
 		d = self.test_class()
 		
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			d.setdefault(self.KEY_UNTRANSFORMED, 1)
 			transform_key_mock.assert_called_once()
-		
-			
+	
 	def test_setdefault_present_transform_once(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
@@ -262,7 +250,7 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(d, 'transform_key', wraps=d.transform_key) as transform_key_mock:
 			list(iter(d))
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called during iteration")
-		
+	
 	def test_keys_no_transform(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
 		
@@ -276,7 +264,7 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			list(d.items())
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for items")
-		
+	
 	def test_values_no_transform(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
 		
@@ -284,14 +272,13 @@ class KeyTransformingDictPerformanceTestMixin:
 			list(d.values())
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for values")
 	
-	
 	def test_copy_method_transform_once_per_key(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
 		
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			d.copy()
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called during copying")
-		
+	
 	def test_copy_transform_once_per_key(self):
 		import copy
 		
@@ -300,7 +287,7 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			copy.copy(d)
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called during copying")
-			
+	
 	def test_deepcopy_transform_once_per_key(self):
 		import copy
 		
@@ -309,7 +296,6 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			copy.deepcopy(d)
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called during copying")
-	
 	
 	def test_or_no_transform_this_class(self):
 		d1 = self.test_class({self.KEY_TRANSFORMED: 1, self.KEY_TRANSFORMED_2: 2})
@@ -326,7 +312,6 @@ class KeyTransformingDictPerformanceTestMixin:
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			d1 |= d2
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not be called when ioring with the same class")
-	
 	
 	def test_or_transform_once_per_key_other_class(self):
 		source_dict = {
@@ -399,7 +384,6 @@ class KeyTransformingDictPerformanceTestMixin:
 				with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 					d1 |= d2
 					self.assertEqual(transform_key_mock.call_count, len(d2), "transform_key should be called once for each key in the other dict")
-	
 	
 	def test_eq_no_transforms_this_class(self):
 		d1 = self.test_class({self.KEY_TRANSFORMED: 1})
