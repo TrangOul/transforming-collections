@@ -4,6 +4,7 @@ import collections
 import abc
 import typing
 
+
 class BaseKeyTransformingDict(collections.UserDict[object, object]):
 	"""
 	Dictionary that transforms keys before using them in any operation.
