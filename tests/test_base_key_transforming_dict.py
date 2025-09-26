@@ -927,11 +927,14 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not found")
 		self.assertNotIn(self.KEY_TRANSFORMED_2, d, "non-existing key found")
 	
-	def test_getitem(self):
+	def test_getitem_present(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
 		d[self.KEY_TRANSFORMED_1]
 		d[self.KEY_UNTRANSFORMED_1]
+	
+	def test_getitem_missing(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for non-existing key"):
 			d[self.KEY_TRANSFORMED_2]
