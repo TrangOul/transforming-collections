@@ -571,7 +571,6 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
 		self.assertEqual(d[self.KEY_TRANSFORMED], 'kwargs', "list's transformed key value not overwritten by kwargs' untransformed key's value")
 	
-	
 	def test_len_overwrite_transformed_key_by_untransformed(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
@@ -586,11 +585,14 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_TRANSFORMED,   d,   "transformed key not found")
 		self.assertNotIn(self.KEY_TRANSFORMED_2, d, "non-existing key found")
 	
-	def test_getitem(self):
+	def test_getitem_present(self):
 		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
 		d[self.KEY_TRANSFORMED]
 		d[self.KEY_UNTRANSFORMED]
+	
+	def test_getitem_missing(self):
+		d = self.test_class({self.KEY_TRANSFORMED: 1})
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for non-existing key"):
 			d[self.KEY_TRANSFORMED_2]
