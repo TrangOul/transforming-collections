@@ -923,8 +923,8 @@ class KeyTransformingDictBaseTestMixin:
 	def test_in(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
-		self.assertIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not found")
+		self.assertIn(self.KEY_UNTRANSFORMED_1,  d, "untransformed key not found")
+		self.assertIn(self.KEY_TRANSFORMED_1,    d,   "transformed key not found")
 		self.assertNotIn(self.KEY_TRANSFORMED_2, d, "non-existing key found")
 	
 	def test_getitem_present(self):
@@ -982,6 +982,22 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
 		self.assertIn(self.KEY_TRANSFORMED_1,   d, "transformed key not found")
 	
+	def test_setitem_preserve_first_key(self):
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		
+		d[self.KEY_UNTRANSFORMED_1_2] = 2
+		keys = set(d)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setting a different key, but same up to transformation, should preserve the first key")
+	
+	def test_setitem_preserve_last_key(self):
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		
+		d[self.KEY_UNTRANSFORMED_1_2] = 2
+		keys = set(d)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "setting a different key, but same up to transformation, should preserve the last key")
+	
 	def test_delitem_untransformed_key(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
@@ -1018,7 +1034,7 @@ class KeyTransformingDictBaseTestMixin:
 	def test_setdefault_missing_transform_key(self):
 		d = self.test_class()
 		
-		d.setdefault(self.KEY_UNTRANSFORMED_1, 1)
+		d.setdefault(self.KEY_UNTRANSFORMED_1)
 		
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found after setdefault")
 		self.assertIn(self.KEY_TRANSFORMED_1, d, "transformed key not found after setdefault")
