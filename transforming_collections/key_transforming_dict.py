@@ -12,13 +12,14 @@ class KeyTransformingDict(collections.UserDict):
 	Optimized so keys are transformed only when necessary, and without repeated redundant transformations.
 	Best for cases where transforming a key is an expensive operation.
 	"""
+	
 	class ItemsView(collections.abc.ItemsView):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
 			key, value = item
-			key = self._mapping.transform_key(key)
+			transformed_key = self._mapping.transform_key(key)
 			try:
-				v = self._mapping._getitem_without_transform(key)[1]
+				original_key, v = self._mapping._getitem_without_transform(transformed_key)
 			except KeyError:
 				return False
 			else:
@@ -26,22 +27,23 @@ class KeyTransformingDict(collections.UserDict):
 		
 		@typing.override
 		def __iter__(self):
-			for key in self._mapping:
-				yield (key, self._mapping._getitem_without_transform(key)[1])
+			for transformed_key in self._mapping.data:
+				yield self._mapping._getitem_without_transform(transformed_key)
 	
 	class ValuesView(collections.abc.ValuesView):
 		@typing.override
 		def __contains__(self, value: object) -> bool:
-			for key in self._mapping:
-				v = self._mapping._getitem_without_transform(key)[1]
+			for transformed_key in self._mapping.data:
+				original_key, v = self._mapping._getitem_without_transform(transformed_key)
 				if v is value or v == value:
 					return True
 			return False
 		
 		@typing.override
 		def __iter__(self):
-			for key in self._mapping:
-				yield self._mapping._getitem_without_transform(key)[1]
+			for transformed_key in self._mapping.data:
+				original_key, v = self._mapping._getitem_without_transform(transformed_key)
+				yield v
 	
 	__marker = object()
 	
