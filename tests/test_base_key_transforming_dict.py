@@ -64,7 +64,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class.fromkeys(source_keys, 'fromkeys')
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "fromkeys should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "fromkeys should preserve the first key")
 	
 	def test_fromkeys_preserve_last_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -72,7 +72,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class.fromkeys(source_keys, 'fromkeys')
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "fromkeys should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "fromkeys should preserve the last key")
 	
 	def test_init_sibling_class_transform_key(self):
 		transformer = str.upper
@@ -105,7 +105,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(source_dict)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from sibling class should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from sibling class should preserve the first key")
 	
 	
 	def test_init_sibling_class_preserve_last_key(self):
@@ -120,7 +120,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(source_dict)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from sibling class should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from sibling class should preserve the last key")
 	
 	def test_init_dict_transform_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED_1: 'untransformed'}
@@ -174,7 +174,7 @@ class KeyTransformingDictBaseTestMixin:
 				d = self.test_class(d2)
 				keys = set(d)
 				
-				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from dict should preserve first key")
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from dict should preserve the first key")
 	
 	def test_init_dict_preserve_last_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -192,7 +192,7 @@ class KeyTransformingDictBaseTestMixin:
 				d = self.test_class(d2)
 				keys = set(d)
 				
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from dict should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from dict should preserve the last key")
 	
 	def test_init_list_preserve_first_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -201,7 +201,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(source_list)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from list should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from list should preserve the first key")
 	
 	def test_init_list_preserve_last_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -210,7 +210,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(source_list)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from list should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from list should preserve the last key")
 	
 	def test_init_kwargs_preserve_first_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -219,7 +219,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(**source_kwargs)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from kwargs should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from kwargs should preserve the first key")
 	
 	def test_init_kwargs_preserve_last_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
@@ -228,7 +228,7 @@ class KeyTransformingDictBaseTestMixin:
 		d = self.test_class(**source_kwargs)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from kwargs should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from kwargs should preserve the last key")
 	
 	def test_init_dict_overwrite_untransformed_by_transformed(self):
 		source_dict = {self.KEY_UNTRANSFORMED_1: 'untransformed', self.KEY_TRANSFORMED_1: 'transformed'}
@@ -509,7 +509,7 @@ class KeyTransformingDictBaseTestMixin:
 		ld.update(ud)
 		keys = set(ld)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with sibling class should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with sibling class should preserve the first key")
 	
 	def test_update_sibling_class_preserve_last_key(self):
 		transformer = str.upper
@@ -525,7 +525,7 @@ class KeyTransformingDictBaseTestMixin:
 		ld.update(ud)
 		keys = set(ld)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with sibling class should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with sibling class should preserve the last key")
 	
 	def test_update_dict_transform_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED_1: 'untransformed'}
@@ -630,7 +630,7 @@ class KeyTransformingDictBaseTestMixin:
 				d.update(d2)
 				keys = set(d)
 				
-				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with dict should preserve first key")
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with dict should preserve the first key")
 	
 	def test_update_dict_preserve_last_key(self):
 		source_dict = {self.KEY_UNTRANSFORMED_1_2: 'dict'}
@@ -650,7 +650,7 @@ class KeyTransformingDictBaseTestMixin:
 				d.update(d2)
 				keys = set(d)
 				
-				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with dict should preserve last key")
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with dict should preserve the last key")
 	
 	def test_update_list_preserve_first_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1_2, 'list']]
@@ -659,7 +659,7 @@ class KeyTransformingDictBaseTestMixin:
 		d.update(source_list)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with list should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with list should preserve the first key")
 	
 	def test_update_list_preserve_last_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1_2, 'list']]
@@ -668,7 +668,7 @@ class KeyTransformingDictBaseTestMixin:
 		d.update(source_list)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with list should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with list should preserve the last key")
 	
 	def test_update_kwargs_preserve_first_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
@@ -677,7 +677,7 @@ class KeyTransformingDictBaseTestMixin:
 		d.update(**source_kwargs)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with kwargs should preserve first key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "update with kwargs should preserve the first key")
 	
 	def test_update_kwargs_preserve_last_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
@@ -686,7 +686,7 @@ class KeyTransformingDictBaseTestMixin:
 		d.update(**source_kwargs)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with kwargs should preserve last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with kwargs should preserve the last key")
 	
 	def test_update_dict_add(self):
 		source_dict   = {self.KEY_UNTRANSFORMED_1: 'dict'}
@@ -1105,6 +1105,13 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_TRANSFORMED_1, d_copy, "transformed key not found in copy")
 		self.assertIn(self.KEY_TRANSFORMED_2, d_copy, "transformed key not found in copy")
 	
+	def test_copy_method_preserve_key(self):
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		d_copy = d.copy()
+		keys = set(d_copy)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "copy method should preserve original key")
+	
 	def test_copy(self):
 		import copy
 		
@@ -1119,19 +1126,48 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertIn(self.KEY_TRANSFORMED_1, d_copy, "transformed key not found in copy")
 		self.assertIn(self.KEY_TRANSFORMED_2, d_copy, "transformed key not found in copy")
 	
+	def test_copy_preserve_key(self):
+		import copy
+		
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		d_copy = copy.copy(d)
+		keys = set(d_copy)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "copy should preserve original key")
+	
 	def test_deepcopy(self):
 		import copy
 		
-		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		d2 = self.test_class({self.KEY_TRANSFORMED_2: 2})
+		d = self.test_class({self.KEY_TRANSFORMED_1: d2})
 		d_copy = copy.deepcopy(d)
+		d2_copy = d_copy[self.KEY_TRANSFORMED_1]
 		
-		self.assertIsInstance(d_copy, self.test_class, f"result should be an instance of self.test_class, not {type(d_copy).__name__}")
-		self.assertEqual(d_copy, d, "copy should be equal to original")
-		self.assertIsNot(d_copy, d, "copy should not be the same object as original")
-		self.assertIn(self.KEY_UNTRANSFORMED_1, d_copy, "untransformed key not found in copy")
-		self.assertIn(self.KEY_UNTRANSFORMED_2, d_copy, "untransformed key not found in copy")
-		self.assertIn(self.KEY_TRANSFORMED_1, d_copy, "transformed key not found in copy")
-		self.assertIn(self.KEY_TRANSFORMED_2, d_copy, "transformed key not found in copy")
+		self.assertIsInstance(d_copy, self.test_class, f"outer copy should be an instance of {self.test_class.__name__}, not {type(d_copy).__name__}")
+		self.assertEqual(d_copy, d, "outer copy should be equal to original")
+		self.assertIsNot(d_copy, d, "outer copy should not be the same object as original")
+		self.assertIn(self.KEY_UNTRANSFORMED_1, d_copy, "untransformed key not found in outer copy")
+		self.assertIn(self.KEY_TRANSFORMED_1, d_copy, "transformed key not found in outer copy")
+		
+		self.assertIsInstance(d2_copy, self.test_class, f"inner copy should be an instance of {self.test_class.__name__}, not {type(d2_copy).__name__}")
+		self.assertEqual(d2_copy, d2, "inner copy should be equal to original")
+		self.assertIsNot(d2_copy, d2, "inner copy should not be the same object as original")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d2_copy, "untransformed key not found in inner copy")
+		self.assertIn(self.KEY_TRANSFORMED_2, d2_copy, "transformed key not found in inner copy")
+	
+	def test_deepcopy_preserve_key(self):
+		import copy
+		
+		d2 = self.test_class({self.KEY_UNTRANSFORMED_1_2: 2})
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: d2})
+		d_copy = copy.deepcopy(d)
+		d2_copy = d_copy[self.KEY_UNTRANSFORMED_1]
+		
+		keys = set(d_copy)
+		keys2 = set(d2_copy)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "outer copy should preserve original key")
+		self.assertEqual(keys2, {self.KEY_UNTRANSFORMED_1_2}, "inner copy should preserve original key")
 	
 	def test_or_add_both(self):
 		source_dict = {
@@ -1318,6 +1354,140 @@ class KeyTransformingDictBaseTestMixin:
 				d1 |= d2
 				
 				self.assertIs(d1, d1_before, "result should be the same object")
+	
+	def test_or_preserve_first_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d3 = d1 | d2
+				keys = set(d3)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "or should preserve the first key")
+	
+	def test_or_preserve_last_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d3 = d1 | d2
+				keys = set(d3)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "or should preserve the last key")
+	
+	def test_ror_preserve_first_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d3 = d2 | d1
+				keys = set(d3)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "ror should preserve the first key")	
+	
+	def test_ror_preserve_last_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d3 = d2 | d1
+				keys = set(d3)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "ror should preserve the last key")
+	
+	def test_ior_preserve_first_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d1 |= d2
+				keys = set(d1)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "ior should preserve the first key")
+	
+	def test_ior_preserve_last_key(self):
+		source_dict = {
+			self.KEY_UNTRANSFORMED_1_2: 1,
+		}
+		ds = (
+			source_dict,
+			collections.Counter(source_dict),
+			collections.OrderedDict(source_dict),
+			collections.defaultdict(None, source_dict),
+			collections.UserDict(source_dict),
+			self.test_class(source_dict),
+		)
+		
+		for d2 in ds:
+			with self.subTest(type_=type(d2).__name__):
+				d1 = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+				
+				d1 |= d2
+				keys = set(d1)
+				
+				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "ior should preserve the last key")
 	
 	def test_eq_transformed(self):
 		source_dict = {
