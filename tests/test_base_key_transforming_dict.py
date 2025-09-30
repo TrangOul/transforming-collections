@@ -1014,14 +1014,25 @@ class KeyTransformingDictBaseTestMixin:
 	def test_pop_untransformed_key(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		d.pop(self.KEY_UNTRANSFORMED_1)
+		value = d.pop(self.KEY_UNTRANSFORMED_1)
 		
+		self.assertEqual(value, 1, "popped value not correct")
 		self.assertEqual(len(d), 0, "non-empty dict after popping the only transformed key")
 		self.assertNotIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not popped")
 		self.assertNotIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not popped")
+	
+	def test_pop_missing_key(self):
+		d = self.test_class()
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for popping non-existing untransformed key"):
 			d.pop(self.KEY_UNTRANSFORMED_1)
+	
+	
+	def test_pop_missing_key_with_default(self):
+		d = self.test_class()
+		
+		popped_default = d.pop(self.KEY_UNTRANSFORMED_1, 'default')
+		self.assertEqual(popped_default, 'default', "popping non-existing key with default should return the default value")
 	
 	def test_popitem(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
@@ -1061,37 +1072,25 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertNotIn(self.KEY_TRANSFORMED_1, keys,   "transformed key found in iteration - iter should return original keys only")
 		self.assertNotIn(self.KEY_TRANSFORMED_2, keys,   "transformed key found in iteration - iter should return original keys only")
 	
-	def test_keys(self):
+	def test_keys_iter(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
 		d = self.test_class({key: 'value' for key in source_keys})
 		
 		keys = d.keys()
 		
 		self.assertEqual(len(keys), 2, "keys view should yield all keys")
-		self.assertIn(self.KEY_TRANSFORMED_1, keys, "transformed key not found in keys view")
-		self.assertIn(self.KEY_TRANSFORMED_2, keys, "transformed key not found in keys view")
-		# KeysView supports key normalization
-		self.assertIn(self.KEY_UNTRANSFORMED_1, keys, "untransformed key not found in keys view")
-		self.assertIn(self.KEY_UNTRANSFORMED_2, keys, "untransformed key not found in keys view")
-		
 		self.assertEqual(tuple(keys), source_keys, "keys view should yield original keys")
 	
-	def test_items(self):
+	def test_items_iter(self):
 		source_items = ((self.KEY_UNTRANSFORMED_1, 1), (self.KEY_UNTRANSFORMED_2, 2))
 		d = self.test_class(source_items)
 		
 		items = d.items()
 		
 		self.assertEqual(len(items), 2, "items view should yield all items")
-		self.assertIn((self.KEY_TRANSFORMED_1, 1), items, "transformed key-value pair not found in items view")
-		self.assertIn((self.KEY_TRANSFORMED_2, 2), items, "transformed key-value pair not found in items view")
-		# ItemsView supports key normalization
-		self.assertIn((self.KEY_UNTRANSFORMED_1, 1), items, "untransformed key-value pair not found in items view")
-		self.assertIn((self.KEY_UNTRANSFORMED_2, 2), items, "untransformed key-value pair not found in items view")
-		
 		self.assertEqual(tuple(items), source_items, "items view should yield original key-value pairs")
 		
-	def test_values(self):
+	def test_values_iter(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
 		source_values = (1, 2)
 		d = self.test_class((key, value) for key, value in zip(source_keys, source_values))
@@ -1099,9 +1098,49 @@ class KeyTransformingDictBaseTestMixin:
 		values = d.values()
 		
 		self.assertEqual(len(values), 2, "values view should yield all values")
+		self.assertEqual(tuple(values), source_values, "values view should yield values in insertion order")
+	
+	def test_keys_contains(self):
+		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
+		d = self.test_class({key: 'value' for key in source_keys})
+		
+		keys = d.keys()
+		
+		self.assertIn(self.KEY_TRANSFORMED_1, keys, "transformed key not found in keys view")
+		self.assertIn(self.KEY_TRANSFORMED_2, keys, "transformed key not found in keys view")
+		# KeysView supports key normalization
+		self.assertIn(self.KEY_UNTRANSFORMED_1, keys, "untransformed key not found in keys view")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, keys, "untransformed key not found in keys view")
+		
+		self.assertNotIn(self.KEY_TRANSFORMED_3, keys, "non-existing key found in keys view")
+	
+	def test_items_contains(self):
+		source_items = ((self.KEY_UNTRANSFORMED_1, 1), (self.KEY_UNTRANSFORMED_2, 2))
+		d = self.test_class(source_items)
+		
+		items = d.items()
+		
+		self.assertIn((self.KEY_TRANSFORMED_1, 1), items, "transformed key-value pair not found in items view")
+		self.assertIn((self.KEY_TRANSFORMED_2, 2), items, "transformed key-value pair not found in items view")
+		# ItemsView supports key normalization
+		self.assertIn((self.KEY_UNTRANSFORMED_1, 1), items, "untransformed key-value pair not found in items view")
+		self.assertIn((self.KEY_UNTRANSFORMED_2, 2), items, "untransformed key-value pair not found in items view")
+		
+		self.assertNotIn((self.KEY_TRANSFORMED_1, 2), items, "key-value pair with existing key, but wrong value found in items view")
+		self.assertNotIn((self.KEY_TRANSFORMED_3, 3), items, "key-value pair with non-existing key found in items view")
+	
+	
+	def test_values_contains(self):
+		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
+		source_values = (1, 2)
+		d = self.test_class((key, value) for key, value in zip(source_keys, source_values))
+		
+		values = d.values()
+		
 		self.assertIn(1, values, "value not found in values view")
 		self.assertIn(2, values, "value not found in values view")
-		self.assertEqual(tuple(values), source_values, "values view should yield values in insertion order")
+		
+		self.assertNotIn(3, values, "non-existing value found in values view")
 	
 	def test_copy_method(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})

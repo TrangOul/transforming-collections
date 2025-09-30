@@ -251,26 +251,47 @@ class KeyTransformingDictPerformanceTestMixin:
 			list(iter(d))
 			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called during iteration")
 	
-	def test_keys_no_transform(self):
+	def test_keys_iter_no_transform(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
 		
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			list(d.keys())
-			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for keys")
+			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called when iterating keys")
 	
-	def test_items_no_transform(self):
+	def test_items_iter_no_transform(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
 		
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			list(d.items())
-			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for items")
+			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called when iterating items")
 	
-	def test_values_no_transform(self):
+	def test_values_iter_no_transform(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
 		
 		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
 			list(d.values())
-			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called for values")
+			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called when iterating values")
+	
+	def test_keys_contains_transform_once(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		
+		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
+			self.KEY_UNTRANSFORMED_1 in d.keys()
+			transform_key_mock.assert_called_once()
+	
+	def test_items_contains_transform_once(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		
+		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
+			(self.KEY_UNTRANSFORMED_1, 1) in d.items()
+			transform_key_mock.assert_called_once()
+	
+	def test_values_contains_no_transform(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		
+		with unittest.mock.patch.object(self.test_class, 'transform_key', wraps=self.test_class.transform_key) as transform_key_mock:
+			1 in d.values()
+			self.assertEqual(transform_key_mock.call_count, 0, "transform_key should not have been called when checking containment in values")
 	
 	def test_copy_method_transform_once_per_key(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})

@@ -17,33 +17,24 @@ class KeyTransformingDict(collections.UserDict):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
 			key, value = item
-			transformed_key = self._mapping.transform_key(key)
 			try:
-				original_key, v = self._mapping._getitem_without_transform(transformed_key)
+				dict_value = self._mapping[key]
 			except KeyError:
 				return False
-			else:
-				return v is value or v == value
+			return dict_value is value or dict_value == value
 		
 		@typing.override
 		def __iter__(self):
-			for transformed_key in self._mapping.data:
-				yield self._mapping._getitem_without_transform(transformed_key)
+			yield from self._mapping.data.values()
 	
 	class ValuesView(collections.abc.ValuesView):
 		@typing.override
 		def __contains__(self, value: object) -> bool:
-			for transformed_key in self._mapping.data:
-				original_key, v = self._mapping._getitem_without_transform(transformed_key)
-				if v is value or v == value:
-					return True
-			return False
+			return any(dict_value is value or dict_value == value for original_key, dict_value in self._mapping.data.values())
 		
 		@typing.override
 		def __iter__(self):
-			for transformed_key in self._mapping.data:
-				original_key, v = self._mapping._getitem_without_transform(transformed_key)
-				yield v
+			yield from (value for original_key, value in self._mapping.data.values())
 	
 	__marker = object()
 	
