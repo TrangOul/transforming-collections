@@ -920,11 +920,15 @@ class KeyTransformingDictBaseTestMixin:
 		
 		self.assertEqual(len(d), 1, "adding the same key (up to transformation) should not increase length")
 	
-	def test_in(self):
+	def test_contains_present(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
 		self.assertIn(self.KEY_UNTRANSFORMED_1,  d, "untransformed key not found")
 		self.assertIn(self.KEY_TRANSFORMED_1,    d,   "transformed key not found")
+	
+	def test_contains_missing(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
+		
 		self.assertNotIn(self.KEY_TRANSFORMED_2, d, "non-existing key found")
 	
 	def test_getitem_present(self):
@@ -946,14 +950,18 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertEqual(d.get(self.KEY_UNTRANSFORMED_1), 1, "untransformed key not found")
 	
 	def test_get_missing_default(self):
-		d = self.test_class()
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		self.assertEqual(d.get(self.KEY_TRANSFORMED_1), None, "non-existing key should return None")
+		value = d.get(self.KEY_TRANSFORMED_2)
+		
+		self.assertEqual(value, None, "non-existing key should return None")
 	
 	def test_get_missing_provided(self):
-		d = self.test_class()
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		self.assertEqual(d.get(self.KEY_TRANSFORMED_1, 2), 2, "non-existing key should return specified default value")
+		value = d.get(self.KEY_TRANSFORMED_2, 2)
+		
+		self.assertEqual(value, 2, "non-existing key should return specified default value")
 	
 	def test_setitem_empty_untransformed(self):
 		d = self.test_class()
@@ -1022,17 +1030,16 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertNotIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not popped")
 	
 	def test_pop_missing_key(self):
-		d = self.test_class()
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for popping non-existing untransformed key"):
-			d.pop(self.KEY_UNTRANSFORMED_1)
-	
+			d.pop(self.KEY_UNTRANSFORMED_2)
 	
 	def test_pop_missing_key_with_default(self):
-		d = self.test_class()
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		popped_default = d.pop(self.KEY_UNTRANSFORMED_1, 'default')
-		self.assertEqual(popped_default, 'default', "popping non-existing key with default should return the default value")
+		popped_default = d.pop(self.KEY_UNTRANSFORMED_2, 'default')
+		self.assertEqual(popped_default, 'default', "popping non-existing key with default should return the provided default value")
 	
 	def test_popitem(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
@@ -1042,22 +1049,57 @@ class KeyTransformingDictBaseTestMixin:
 		self.assertEqual(key, self.KEY_TRANSFORMED_1, "transformed key not popped")
 		self.assertNotEqual(key, self.KEY_UNTRANSFORMED_1, "untransformed key popped - popitem should return transformed key only")
 	
-	def test_setdefault_missing_transform_key(self):
-		d = self.test_class()
+	def test_setdefault_transform_key_missing_default(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
-		d.setdefault(self.KEY_UNTRANSFORMED_1)
+		value = d.setdefault(self.KEY_UNTRANSFORMED_2)
 		
-		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found after setdefault")
-		self.assertIn(self.KEY_TRANSFORMED_1, d, "transformed key not found after setdefault")
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key not found after setdefault")
+		self.assertIn(self.KEY_TRANSFORMED_2, d, "transformed key not found after setdefault")
+		self.assertEqual(value, None, " default value not returned for missing key")
 	
-	def test_setdefault_present_set_untransformed_key(self):
+	def test_setdefault_transform_key_missing_provided(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
+		
+		value = d.setdefault(self.KEY_UNTRANSFORMED_2, 2)
+		
+		self.assertIn(self.KEY_UNTRANSFORMED_2, d, "untransformed key not found after setdefault")
+		self.assertIn(self.KEY_TRANSFORMED_2, d, "transformed key not found after setdefault")
+		self.assertEqual(value, 2, "provided value not returned for missing key")
+	
+	def test_setdefault_present_default(self):
+		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
+		
+		value = d.setdefault(self.KEY_UNTRANSFORMED_1)
+		
+		self.assertIn(self.KEY_TRANSFORMED_1, d, "transformed key not found after setdefault")
+		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found after setdefault")
+		self.assertEqual(value, 1, "old value not returned for untransformed key")
+	
+	def test_setdefault_present_provided(self):
 		d = self.test_class({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.setdefault(self.KEY_UNTRANSFORMED_1, 2)
 		
-		self.assertEqual(value, 1, "present value not returned for untransformed key")
 		self.assertIn(self.KEY_TRANSFORMED_1, d, "transformed key not found after setdefault")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found after setdefault")
+		self.assertEqual(value, 1, "old value not returned for untransformed key")
+	
+	def test_setdefault_present_preserve_first_key(self):
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		
+		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
+		keys = set(d)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setdefault with different key, but same up to transformation, should preserve the first key")
+	
+	def test_setdefault_present_preserve_last_key(self):
+		d = self.test_class({self.KEY_UNTRANSFORMED_1: 1})
+		
+		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
+		keys = set(d)
+		
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "setdefault with different key, but same up to transformation, should preserve the last key")
 	
 	def test_iter(self):
 		source_keys = {self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2}
