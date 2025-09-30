@@ -198,4 +198,4 @@ class KeyTransformingDict(collections.UserDict):
 	
 	@typing.override
 	def __repr__(self) -> str:
-		return f'{type(self).__name__}({dict(d.data.values())!r})'
+		return f'{type(self).__name__}({dict(self.data.values())!r})'
