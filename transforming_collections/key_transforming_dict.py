@@ -14,17 +14,17 @@ class KeyTransformingDict(collections.UserDict):
 	"""
 	
 	@classmethod
-	def create(cls, name: str | None, transform_key, *, replace_keys: bool = False):
+	def create(cls, name: str | None, transform_key, *, retain_first_key: bool = True):
 		if name is None:
 			func_name = getattr(transform_key, "__name__", repr(transform_key))
 			name = f"{cls.__name__}[{func_name}]"
-
+		
 		attrs = {
 			"transform_key": staticmethod(transform_key),
-			"_replace_keys": replace_keys,
+			"_retain_first_key": retain_first_key,
 		}
 		return type(name, (cls,), attrs)
-
+	
 	class ItemsView(collections.abc.ItemsView):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
@@ -59,13 +59,7 @@ class KeyTransformingDict(collections.UserDict):
 		must return the same result.
 		"""
 		raise NotImplementedError
-	'''
-	#TODO
-	def __init__(self, transform_key, replace_keys:bool=False, *args, **kwargs):
-		self.transform_key = transform_key
-		self.replace_keys = replace_keys
-		super().__init__(*args, **kwargs)
-	'''
+	
 	@classmethod
 	def factory(cls, name: str, key_transformer):
 		return type( name, (cls,), { 'transform_key': staticmethod(key_transformer) } )
@@ -123,6 +117,8 @@ class KeyTransformingDict(collections.UserDict):
 		return super().__getitem__(key)
 	
 	def _setitem_without_transform(self, transformed_key: object, original_key: object, value: object) -> None:
+		if not self._retain_first_key and transformed_key in self.data:
+			original_key, dict_value = self._getitem_without_transform(transformed_key)
 		super().__setitem__(transformed_key, (original_key, value))
 	
 	def _delitem_without_transform(self, key: object) -> None:
