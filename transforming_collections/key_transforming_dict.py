@@ -13,6 +13,18 @@ class KeyTransformingDict(collections.UserDict):
 	Best for cases where transforming a key is an expensive operation.
 	"""
 	
+	@classmethod
+	def create(cls, name: str | None, transform_key, *, replace_keys: bool = False):
+		if name is None:
+			func_name = getattr(transform_key, "__name__", repr(transform_key))
+			name = f"{cls.__name__}[{func_name}]"
+
+		attrs = {
+			"transform_key": staticmethod(transform_key),
+			"_replace_keys": replace_keys,
+		}
+		return type(name, (cls,), attrs)
+
 	class ItemsView(collections.abc.ItemsView):
 		@typing.override
 		def __contains__(self, item: object) -> bool:
