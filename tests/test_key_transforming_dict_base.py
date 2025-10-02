@@ -5,9 +5,9 @@ import collections
 
 from transforming_collections import KeyTransformingDict
 
-TestLowercaseDict = KeyTransformingDict.create('TestLowercaseDict', str.lower)
+LowercaseDict = KeyTransformingDict.create('LowercaseDict', str.lower)
 
-class TestLowercaseDictBase(unittest.TestCase):
+class LowercaseDictBaseTest(unittest.TestCase):
 	KEY_UNTRANSFORMED_1 = 'AbCαΒγАбВ'
 	KEY_UNTRANSFORMED_1_2 = 'aBcΑβΓаБв'
 	KEY_TRANSFORMED_1   = 'abcαβγабв'
@@ -17,7 +17,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	KEY_TRANSFORMED_3   = 'xyzxyz'
 	
 	def test_subclassing(self):
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		self.assertIsInstance(d,          collections.abc.MutableMapping)
 		self.assertIsInstance(d.keys(),   collections.abc.KeysView)
@@ -27,7 +27,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_fromkeys_transform_key(self):
 		source_keys = {self.KEY_UNTRANSFORMED_1}
 		
-		d = TestLowercaseDict.fromkeys(source_keys, 'fromkeys')
+		d = LowercaseDict.fromkeys(source_keys, 'fromkeys')
 		
 		self.assertEqual(len(d), 1, "fromkeys should create dict with one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -36,7 +36,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_fromkeys_same_keys_up_to_transformation(self):
 		source_keys = {self.KEY_UNTRANSFORMED_1, self.KEY_TRANSFORMED_1}
 		
-		d = TestLowercaseDict.fromkeys(source_keys, 'fromkeys')
+		d = LowercaseDict.fromkeys(source_keys, 'fromkeys')
 			
 		self.assertEqual(len(d), 1, "fromkeys should create dict with one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -45,7 +45,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_fromkeys_multiple_keys(self):
 		source_keys = {self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2}
 		
-		d = TestLowercaseDict.fromkeys(source_keys, 'fromkeys')
+		d = LowercaseDict.fromkeys(source_keys, 'fromkeys')
 			
 		self.assertEqual(len(d), 2, "fromkeys should create dict with both keys")
 		self.assertIn(self.KEY_UNTRANSFORMED_1,   d, "untransformed key not found")
@@ -55,11 +55,11 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_init_sibling_class_transform_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer)
 		
-		source_dict = TestUppercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed'})
+		source_dict = UppercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed'})
 		
-		d = TestLowercaseDict(source_dict)
+		d = LowercaseDict(source_dict)
 		keys = set(d)
 		
 		self.assertIn(self.KEY_TRANSFORMED_1, d, "transformed key not found in dict")
@@ -80,7 +80,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict(d2)
+				d = LowercaseDict(d2)
 				
 				self.assertEqual(len(d), 1, "dict should have one key")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -89,7 +89,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_init_list_transform_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1, 'untransformed']]
 		
-		d = TestLowercaseDict(source_list)
+		d = LowercaseDict(source_list)
 		
 		self.assertEqual(len(d), 1, "list should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -98,7 +98,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_init_kwargs_transform_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1: 'untransformed'}
 		
-		d = TestLowercaseDict(**source_kwargs)
+		d = LowercaseDict(**source_kwargs)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -118,7 +118,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 			with self.subTest(type_=type(d2).__name__):
 				self.assertEqual(list(d2), [self.KEY_UNTRANSFORMED_1, self.KEY_TRANSFORMED_1], 'dict keys not in expected order')
 				
-				d = TestLowercaseDict(d2)
+				d = LowercaseDict(d2)
 				
 				self.assertEqual(len(d), 1, "dict should have one key")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -128,7 +128,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_init_list_overwrite_untransformed_by_transformed(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1, 'untransformed'], [self.KEY_TRANSFORMED_1, 'transformed']]
 		
-		d = TestLowercaseDict(source_list)
+		d = LowercaseDict(source_list)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -140,7 +140,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(len(source_kwargs), 2)
 		self.assertEqual(list(source_kwargs), [self.KEY_UNTRANSFORMED_1, self.KEY_TRANSFORMED_1], 'kwargs keys not in expected order')
 		
-		d = TestLowercaseDict(**source_kwargs)
+		d = LowercaseDict(**source_kwargs)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -161,7 +161,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 			with self.subTest(type_=type(d2).__name__):
 				self.assertEqual(list(d2), [self.KEY_TRANSFORMED_1, self.KEY_UNTRANSFORMED_1], 'dict keys not in expected order')
 				
-				d = TestLowercaseDict(d2)
+				d = LowercaseDict(d2)
 				
 				self.assertEqual(len(d), 1, "dict should have one key")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -171,7 +171,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_init_list_overwrite_transformed_by_untransformed(self):
 		source_list = [[self.KEY_TRANSFORMED_1, 'transformed'], [self.KEY_UNTRANSFORMED_1, 'untransformed']]
 		
-		d = TestLowercaseDict(source_list)
+		d = LowercaseDict(source_list)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -183,7 +183,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(len(source_kwargs), 2)
 		self.assertEqual(list(source_kwargs), [self.KEY_TRANSFORMED_1, self.KEY_UNTRANSFORMED_1], 'kwargs keys not in expected order')
 		
-		d = TestLowercaseDict(**source_kwargs)
+		d = LowercaseDict(**source_kwargs)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -200,12 +200,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict(d2, **source_kwargs)
+				d = LowercaseDict(d2, **source_kwargs)
 				
 				self.assertEqual(len(d), 2, "dict should have both keys")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key from dict not found")
@@ -217,7 +217,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'dict']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
 		
-		d = TestLowercaseDict(source_list, **source_kwargs)
+		d = LowercaseDict(source_list, **source_kwargs)
 		
 		self.assertEqual(len(d), 2, "dict should have both keys")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key from list not found")
@@ -235,12 +235,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict(d2, **source_kwargs)
+				d = LowercaseDict(d2, **source_kwargs)
 				
 				self.assertEqual(len(d), 1, "dict should have one key")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -251,7 +251,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_TRANSFORMED_1: 'kwargs'}
 		
-		d = TestLowercaseDict(source_list, **source_kwargs)
+		d = LowercaseDict(source_list, **source_kwargs)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -268,12 +268,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict(d2, **source_kwargs)
+				d = LowercaseDict(d2, **source_kwargs)
 				
 				self.assertEqual(len(d), 1, "dict should have one key")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -284,7 +284,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		source_list   = [[self.KEY_TRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1: 'kwargs'}
 		
-		d = TestLowercaseDict(source_list, **source_kwargs)
+		d = LowercaseDict(source_list, **source_kwargs)
 		
 		self.assertEqual(len(d), 1, "dict should have one key")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d, "untransformed key not found")
@@ -293,10 +293,10 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_update_sibling_class_transform_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer)
 		
-		ld = TestLowercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed'})
-		ud = TestUppercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed2'})
+		ld = LowercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed'})
+		ud = UppercaseDict({self.KEY_UNTRANSFORMED_1: 'untransformed2'})
 		
 		ld.update(ud)
 		keys = set(ld)
@@ -315,12 +315,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict()
+				d = LowercaseDict()
 				
 				d.update(d2)
 				
@@ -330,7 +330,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_update_list_transform_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1, 'untransformed']]
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d.update(source_list)
 		
@@ -340,7 +340,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_update_kwargs_transform_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1: 'untransformed'}
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d.update(**source_kwargs)
 		
@@ -356,12 +356,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
+				d = LowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
 				
 				d.update(d2)
 				
@@ -371,7 +371,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 				self.assertEqual(d[self.KEY_TRANSFORMED_1], 'dict', "original key's value not overwritten by dict's untransformed key's value")
 	
 	def test_update_list_overwrite_transformed_by_untransformed(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
 		source_list = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		
 		d.update(source_list)
@@ -382,7 +382,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(d[self.KEY_TRANSFORMED_1], 'list', "original key's value not overwritten by list's untransformed key's value")
 	
 	def test_update_kwargs_overwrite_transformed_by_untransformed(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 'original'})
 		source_kwargs = {self.KEY_UNTRANSFORMED_1: 'kwargs'}
 		
 		d.update(**source_kwargs)
@@ -400,12 +400,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):	
-				d = TestLowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
+				d = LowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
 				
 				d.update(d2)
 				
@@ -417,7 +417,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_update_list_add(self):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'dict']]
-		d = TestLowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
+		d = LowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(source_list)
 		
@@ -429,7 +429,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_update_kwargs_add(self):
 		source_kwargs   = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
-		d = TestLowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
+		d = LowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(**source_kwargs)
 		
@@ -449,12 +449,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
+				d = LowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
 				
 				d.update(d2, **source_kwargs)
 				
@@ -469,7 +469,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_update_list_kwargs_add_both(self):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'dict']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_2: 'kwargs'}
-		d = TestLowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
+		d = LowercaseDict({self.KEY_UNTRANSFORMED_3: 'original'})
 		
 		d.update(source_list, **source_kwargs)
 		
@@ -491,12 +491,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict()
+				d = LowercaseDict()
 				
 				d.update(d2, **source_kwargs)
 				
@@ -508,7 +508,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_update_list_kwargs_overwrite_untransformed_by_transformed(self):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_TRANSFORMED_1: 'kwargs'}
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d.update(source_list, **source_kwargs)
 		
@@ -527,12 +527,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDict()
+				d = LowercaseDict()
 				
 				d.update(d2, **source_kwargs)
 				
@@ -544,7 +544,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_update_list_kwargs_overwrite_transformed_by_untransformed(self):
 		source_list   = [[self.KEY_TRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1: 'kwargs'}
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d.update(source_list, **source_kwargs)
 		
@@ -554,57 +554,57 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(d[self.KEY_TRANSFORMED_1], 'kwargs', "list's transformed key value not overwritten by kwargs' untransformed key's value")
 	
 	def test_len_overwrite_transformed_key_by_untransformed(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		d[self.KEY_UNTRANSFORMED_1] = 2
 		
 		self.assertEqual(len(d), 1, "adding the same key (up to transformation) should not increase length")
 	
 	def test_contains_present(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		self.assertIn(self.KEY_UNTRANSFORMED_1,  d, "untransformed key not found")
 		self.assertIn(self.KEY_TRANSFORMED_1,    d,   "transformed key not found")
 	
 	def test_contains_missing(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		self.assertNotIn(self.KEY_TRANSFORMED_2, d, "non-existing key found")
 	
 	def test_getitem_present(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		d[self.KEY_TRANSFORMED_1]
 		d[self.KEY_UNTRANSFORMED_1]
 	
 	def test_getitem_missing(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for non-existing key"):
 			d[self.KEY_TRANSFORMED_2]
 	
 	def test_get_present(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		self.assertEqual(d.get(self.KEY_TRANSFORMED_1),   1,   "transformed key not found")
 		self.assertEqual(d.get(self.KEY_UNTRANSFORMED_1), 1, "untransformed key not found")
 	
 	def test_get_missing_default(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.get(self.KEY_TRANSFORMED_2)
 		
 		self.assertEqual(value, None, "non-existing key should return None")
 	
 	def test_get_missing_provided(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.get(self.KEY_TRANSFORMED_2, 2)
 		
 		self.assertEqual(value, 2, "non-existing key should return specified default value")
 	
 	def test_setitem_empty_untransformed(self):
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d[self.KEY_UNTRANSFORMED_1] = 1
 		
@@ -613,7 +613,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not found")
 	
 	def test_setitem_empty_transformed(self):
-		d = TestLowercaseDict()
+		d = LowercaseDict()
 		
 		d[self.KEY_TRANSFORMED_1] = 1
 		
@@ -622,7 +622,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not found")
 	
 	def test_setitem_overwrite_transformed_by_untransformed(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		d[self.KEY_UNTRANSFORMED_1] = 2
 		
@@ -631,7 +631,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertIn(self.KEY_TRANSFORMED_1,   d, "transformed key not found")
 	
 	def test_delitem_untransformed_key(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		del d[self.KEY_UNTRANSFORMED_1]
 		
@@ -644,7 +644,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 			del d[self.KEY_TRANSFORMED_1]
 	
 	def test_pop_untransformed_key(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.pop(self.KEY_UNTRANSFORMED_1)
 		
@@ -654,19 +654,19 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertNotIn(self.KEY_TRANSFORMED_1,   d,   "transformed key not popped")
 	
 	def test_pop_missing_key(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		with self.assertRaises(KeyError, msg="KeyError not raised for popping non-existing untransformed key"):
 			d.pop(self.KEY_UNTRANSFORMED_2)
 	
 	def test_pop_missing_key_with_default(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		popped_default = d.pop(self.KEY_UNTRANSFORMED_2, 'default')
 		self.assertEqual(popped_default, 'default', "popping non-existing key with default should return the provided default value")
 	
 	def test_popitem(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		key, value = d.popitem()
 		self.assertEqual(len(d), 0, "non-empty dict after popping the only item")
@@ -674,7 +674,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertNotEqual(key, self.KEY_UNTRANSFORMED_1, "untransformed key popped - popitem should return transformed key only")
 	
 	def test_setdefault_transform_key_missing_default(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.setdefault(self.KEY_UNTRANSFORMED_2)
 		
@@ -683,7 +683,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(value, None, " default value not returned for missing key")
 	
 	def test_setdefault_transform_key_missing_provided(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.setdefault(self.KEY_UNTRANSFORMED_2, 2)
 		
@@ -692,7 +692,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(value, 2, "provided value not returned for missing key")
 	
 	def test_setdefault_present_default(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.setdefault(self.KEY_UNTRANSFORMED_1)
 		
@@ -701,7 +701,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertEqual(value, 1, "old value not returned for untransformed key")
 	
 	def test_setdefault_present_provided(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 		
 		value = d.setdefault(self.KEY_UNTRANSFORMED_1, 2)
 		
@@ -711,7 +711,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_iter(self):
 		source_keys = {self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2}
-		d = TestLowercaseDict({key: 'value' for key in source_keys})
+		d = LowercaseDict({key: 'value' for key in source_keys})
 		
 		keys = set(d)
 		
@@ -724,7 +724,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_keys_iter(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
-		d = TestLowercaseDict({key: 'value' for key in source_keys})
+		d = LowercaseDict({key: 'value' for key in source_keys})
 		
 		keys = d.keys()
 		
@@ -733,7 +733,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_items_iter(self):
 		source_items = ((self.KEY_UNTRANSFORMED_1, 1), (self.KEY_UNTRANSFORMED_2, 2))
-		d = TestLowercaseDict(source_items)
+		d = LowercaseDict(source_items)
 		
 		items = d.items()
 		
@@ -743,7 +743,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_values_iter(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
 		source_values = (1, 2)
-		d = TestLowercaseDict((key, value) for key, value in zip(source_keys, source_values))
+		d = LowercaseDict((key, value) for key, value in zip(source_keys, source_values))
 		
 		values = d.values()
 		
@@ -752,7 +752,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_keys_contains(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
-		d = TestLowercaseDict({key: 'value' for key in source_keys})
+		d = LowercaseDict({key: 'value' for key in source_keys})
 		
 		keys = d.keys()
 		
@@ -766,7 +766,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	
 	def test_items_contains(self):
 		source_items = ((self.KEY_UNTRANSFORMED_1, 1), (self.KEY_UNTRANSFORMED_2, 2))
-		d = TestLowercaseDict(source_items)
+		d = LowercaseDict(source_items)
 		
 		items = d.items()
 		
@@ -783,7 +783,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_values_contains(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_2)
 		source_values = (1, 2)
-		d = TestLowercaseDict((key, value) for key, value in zip(source_keys, source_values))
+		d = LowercaseDict((key, value) for key, value in zip(source_keys, source_values))
 		
 		values = d.values()
 		
@@ -793,10 +793,10 @@ class TestLowercaseDictBase(unittest.TestCase):
 		self.assertNotIn(3, values, "non-existing value found in values view")
 	
 	def test_copy_method(self):
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
 		d_copy = d.copy()
 		
-		self.assertIsInstance(d_copy, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d_copy).__name__}")
+		self.assertIsInstance(d_copy, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d_copy).__name__}")
 		self.assertEqual(d_copy, d, "copy should be equal to original")
 		self.assertIsNot(d_copy, d, "copy should not be the same object as original")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d_copy, "untransformed key not found in copy")
@@ -807,10 +807,10 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_copy(self):
 		import copy
 		
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: 1, self.KEY_TRANSFORMED_2: 2})
 		d_copy = copy.copy(d)
 		
-		self.assertIsInstance(d_copy, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d_copy).__name__}")
+		self.assertIsInstance(d_copy, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d_copy).__name__}")
 		self.assertEqual(d_copy, d, "copy should be equal to original")
 		self.assertIsNot(d_copy, d, "copy should not be the same object as original")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d_copy, "untransformed key not found in copy")
@@ -821,18 +821,18 @@ class TestLowercaseDictBase(unittest.TestCase):
 	def test_deepcopy(self):
 		import copy
 		
-		d2 = TestLowercaseDict({self.KEY_TRANSFORMED_2: 2})
-		d = TestLowercaseDict({self.KEY_TRANSFORMED_1: d2})
+		d2 = LowercaseDict({self.KEY_TRANSFORMED_2: 2})
+		d = LowercaseDict({self.KEY_TRANSFORMED_1: d2})
 		d_copy = copy.deepcopy(d)
 		d2_copy = d_copy[self.KEY_TRANSFORMED_1]
 		
-		self.assertIsInstance(d_copy, TestLowercaseDict, f"outer copy should be an instance of {TestLowercaseDict.__name__}, not {type(d_copy).__name__}")
+		self.assertIsInstance(d_copy, LowercaseDict, f"outer copy should be an instance of {LowercaseDict.__name__}, not {type(d_copy).__name__}")
 		self.assertEqual(d_copy, d, "outer copy should be equal to original")
 		self.assertIsNot(d_copy, d, "outer copy should not be the same object as original")
 		self.assertIn(self.KEY_UNTRANSFORMED_1, d_copy, "untransformed key not found in outer copy")
 		self.assertIn(self.KEY_TRANSFORMED_1, d_copy, "transformed key not found in outer copy")
 		
-		self.assertIsInstance(d2_copy, TestLowercaseDict, f"inner copy should be an instance of {TestLowercaseDict.__name__}, not {type(d2_copy).__name__}")
+		self.assertIsInstance(d2_copy, LowercaseDict, f"inner copy should be an instance of {LowercaseDict.__name__}, not {type(d2_copy).__name__}")
 		self.assertEqual(d2_copy, d2, "inner copy should be equal to original")
 		self.assertIsNot(d2_copy, d2, "inner copy should not be the same object as original")
 		self.assertIn(self.KEY_UNTRANSFORMED_2, d2_copy, "untransformed key not found in inner copy")
@@ -850,16 +850,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d3 = d1 | d2
 				
-				self.assertIsInstance(d3, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d3).__name__}")
+				self.assertIsInstance(d3, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d3).__name__}")
 				self.assertEqual(len(d3), 2, "dict should have both keys")
 				self.assertIn(self.KEY_TRANSFORMED_1, d3, "untransformed key from dict 1 not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d3, "transformed key from dict 1 not found")
@@ -878,16 +878,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d3 = d2 | d1
 				
-				self.assertIsInstance(d3, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d3).__name__}")
+				self.assertIsInstance(d3, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d3).__name__}")
 				self.assertEqual(len(d3), 2, f"dict should have both keys: {d3.keys()}")
 				self.assertIn(self.KEY_TRANSFORMED_1, d3, "untransformed key from dict 1 not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d3, "transformed key from dict 1 not found")
@@ -906,16 +906,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d1 |= d2
 				
-				self.assertIsInstance(d1, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d1).__name__}")
+				self.assertIsInstance(d1, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d1).__name__}")
 				self.assertEqual(len(d1), 2, f"dict should have both keys: {d1.keys()}")
 				self.assertIn(self.KEY_TRANSFORMED_1, d1, "untransformed key from dict 1 not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d1, "transformed key from dict 1 not found")
@@ -933,16 +933,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d3 = d1 | d2
 				
-				self.assertIsInstance(d3, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d3).__name__}")
+				self.assertIsInstance(d3, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d3).__name__}")
 				self.assertEqual(len(d3), 1, "dict should have one key")
 				self.assertIn(self.KEY_TRANSFORMED_1, d3, "untransformed key not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d3, "transformed keynot found")
@@ -960,16 +960,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d3 = d2 | d1
 				
-				self.assertIsInstance(d3, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d3).__name__}")
+				self.assertIsInstance(d3, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d3).__name__}")
 				self.assertEqual(len(d3), 1, "dict should have one key")
 				self.assertIn(self.KEY_TRANSFORMED_1, d3, "untransformed key not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d3, "transformed keynot found")
@@ -987,16 +987,16 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				d1 |= d2
 				
-				self.assertIsInstance(d1, TestLowercaseDict, f"result should be an instance of TestLowercaseDict, not {type(d1).__name__}")
+				self.assertIsInstance(d1, LowercaseDict, f"result should be an instance of LowercaseDict, not {type(d1).__name__}")
 				self.assertEqual(len(d1), 1, "dict should have one key")
 				self.assertIn(self.KEY_TRANSFORMED_1, d1, "untransformed key not found")
 				self.assertIn(self.KEY_UNTRANSFORMED_1, d1, "transformed keynot found")
@@ -1012,12 +1012,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict()
+				d1 = LowercaseDict()
 				
 				d1_before = d1
 				d1 |= d2
@@ -1035,12 +1035,12 @@ class TestLowercaseDictBase(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDict(source_dict),
+			LowercaseDict(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				self.assertEqual(d1, d2, "dicts with same keys and values should be equal")
 	
@@ -1059,7 +1059,7 @@ class TestLowercaseDictBase(unittest.TestCase):
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDict({self.KEY_TRANSFORMED_1: 1})
+				d1 = LowercaseDict({self.KEY_TRANSFORMED_1: 1})
 				
 				self.assertNotEqual(d1, d2, "dicts with same keys (up to transformation) and values should not be equal unless the keys are exactly equal")
 

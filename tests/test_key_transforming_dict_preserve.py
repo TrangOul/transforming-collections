@@ -5,10 +5,10 @@ import collections
 
 from transforming_collections import KeyTransformingDict
 
-TestLowercaseDictFirstKey = KeyTransformingDict.create('TestLowercaseDictFirstKey', str.lower)
-TestLowercaseDictLastKey  = KeyTransformingDict.create('TestLowercaseDictFirstKey', str.lower, retain_first_key=False)
+LowercaseDictFirstKey = KeyTransformingDict.create('LowercaseDictFirstKey', str.lower)
+LowercaseDictLastKey  = KeyTransformingDict.create('LowercaseDictFirstKey', str.lower, retain_first_key=False)
 
-class TestLowercaseDictPreserve(unittest.TestCase):
+class LowercaseDictPreserveTest(unittest.TestCase):
 	KEY_UNTRANSFORMED_1 = 'AbCαΒγАбВ'
 	KEY_UNTRANSFORMED_1_2 = 'aBcΑβΓаБв'
 	KEY_TRANSFORMED_1   = 'abcαβγабв'
@@ -20,7 +20,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_fromkeys_preserve_first_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		
-		d = TestLowercaseDictFirstKey.fromkeys(source_keys, 'fromkeys')
+		d = LowercaseDictFirstKey.fromkeys(source_keys, 'fromkeys')
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "fromkeys should preserve the first key")
@@ -28,19 +28,19 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_fromkeys_preserve_last_key(self):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		
-		d = TestLowercaseDictLastKey.fromkeys(source_keys, 'fromkeys')
+		d = LowercaseDictLastKey.fromkeys(source_keys, 'fromkeys')
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "fromkeys should preserve the last key")
 	
 	def test_init_sibling_class_preserve_first_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer)
 		
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
-		source_dict = TestUppercaseDict({key: 'value' for key in source_keys})
+		source_dict = UppercaseDict({key: 'value' for key in source_keys})
 		
-		d = TestLowercaseDictFirstKey(source_dict)
+		d = LowercaseDictFirstKey(source_dict)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from sibling class should preserve the first key")
@@ -48,12 +48,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_init_sibling_class_preserve_last_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer, retain_first_key=False)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer, retain_first_key=False)
 		
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
-		source_dict = TestUppercaseDict({key: 'value' for key in source_keys})
+		source_dict = UppercaseDict({key: 'value' for key in source_keys})
 		
-		d = TestLowercaseDictLastKey(source_dict)
+		d = LowercaseDictLastKey(source_dict)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from sibling class should preserve the last key")
@@ -71,7 +71,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictFirstKey(d2)
+				d = LowercaseDictFirstKey(d2)
 				keys = set(d)
 				
 				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from dict should preserve the first key")
@@ -89,7 +89,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictLastKey(d2)
+				d = LowercaseDictLastKey(d2)
 				keys = set(d)
 				
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from dict should preserve the last key")
@@ -98,7 +98,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		source_list = [[key, 'value'] for key in source_keys]
 		
-		d = TestLowercaseDictFirstKey(source_list)
+		d = LowercaseDictFirstKey(source_list)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from list should preserve the first key")
@@ -107,7 +107,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		source_list = [[key, 'value'] for key in source_keys]
 		
-		d = TestLowercaseDictLastKey(source_list)
+		d = LowercaseDictLastKey(source_list)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from list should preserve the last key")
@@ -116,7 +116,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		source_kwargs = {key: 'value' for key in source_keys}
 		
-		d = TestLowercaseDictFirstKey(**source_kwargs)
+		d = LowercaseDictFirstKey(**source_kwargs)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from kwargs should preserve the first key")
@@ -125,7 +125,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
 		source_kwargs = {key: 'value' for key in source_keys}
 		
-		d = TestLowercaseDictLastKey(**source_kwargs)
+		d = LowercaseDictLastKey(**source_kwargs)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from kwargs should preserve the last key")
@@ -140,12 +140,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictFirstKey(d2, **source_kwargs)
+				d = LowercaseDictFirstKey(d2, **source_kwargs)
 				keys = set(d)
 				
 				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from dict and kwargs should preserve dict key")
@@ -160,12 +160,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictLastKey(d2, **source_kwargs)
+				d = LowercaseDictLastKey(d2, **source_kwargs)
 				keys = set(d)
 				
 				self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from dict and kwargs should preserve kwargs key")
@@ -174,7 +174,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
 		
-		d = TestLowercaseDictFirstKey(source_list, **source_kwargs)
+		d = LowercaseDictFirstKey(source_list, **source_kwargs)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "init from list and kwargs should preserve list key")
@@ -183,17 +183,17 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
 		
-		d = TestLowercaseDictLastKey(source_list, **source_kwargs)
+		d = LowercaseDictLastKey(source_list, **source_kwargs)
 		keys = set(d)
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "init from list and kwargs should preserve kwargs key")
 	
 	def test_update_sibling_class_preserve_first_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer)
 		
-		ld = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
-		ud = TestUppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
+		ld = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
+		ud = UppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
 		
 		ld.update(ud)
 		keys = set(ld)
@@ -202,10 +202,10 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_update_sibling_class_preserve_last_key(self):
 		transformer = str.upper
-		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
+		UppercaseDict = KeyTransformingDict.create('UppercaseDict', transformer)
 		
-		ld = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
-		ud = TestUppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
+		ld = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
+		ud = UppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
 		
 		ld.update(ud)
 		keys = set(ld)
@@ -220,12 +220,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
+				d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
 				
 				d.update(d2)
 				keys = set(d)
@@ -240,12 +240,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
+				d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
 				
 				d.update(d2)
 				keys = set(d)
@@ -254,7 +254,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_update_list_preserve_first_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1_2, 'list']]
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
 		
 		d.update(source_list)
 		keys = set(d)
@@ -263,7 +263,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_update_list_preserve_last_key(self):
 		source_list = [[self.KEY_UNTRANSFORMED_1_2, 'list']]
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
 		
 		d.update(source_list)
 		keys = set(d)
@@ -272,7 +272,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_update_kwargs_preserve_first_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'original'})
 		
 		d.update(**source_kwargs)
 		keys = set(d)
@@ -281,7 +281,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	def test_update_kwargs_preserve_last_key(self):
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'original'})
 		
 		d.update(**source_kwargs)
 		keys = set(d)
@@ -298,12 +298,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictFirstKey()
+				d = LowercaseDictFirstKey()
 				
 				d.update(d2, **source_kwargs)
 				keys = set(d)
@@ -320,12 +320,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d = TestLowercaseDictLastKey()
+				d = LowercaseDictLastKey()
 				
 				d.update(d2, **source_kwargs)
 				keys = set(d)
@@ -335,7 +335,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_update_list_kwargs_preserve_list_key(self):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
-		d = TestLowercaseDictFirstKey()
+		d = LowercaseDictFirstKey()
 		
 		d.update(source_list, **source_kwargs)
 		keys = set(d)
@@ -345,7 +345,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_update_list_kwargs_preserve_kwargs_key(self):
 		source_list   = [[self.KEY_UNTRANSFORMED_1, 'list']]
 		source_kwargs = {self.KEY_UNTRANSFORMED_1_2: 'kwargs'}
-		d = TestLowercaseDictLastKey()
+		d = LowercaseDictLastKey()
 		
 		d.update(source_list, **source_kwargs)
 		keys = set(d)
@@ -353,7 +353,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "update with list and kwargs should preserve kwargs key")
 	
 	def test_setitem_preserve_first_key(self):
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d[self.KEY_UNTRANSFORMED_1_2] = 2
 		keys = set(d)
@@ -361,7 +361,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setting a different key, but same up to transformation, should preserve the first key")
 	
 	def test_setitem_preserve_last_key(self):
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d[self.KEY_UNTRANSFORMED_1_2] = 2
 		keys = set(d)
@@ -369,7 +369,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "setting a different key, but same up to transformation, should preserve the last key")
 	
 	def test_setdefault_present_preserve_key_first(self):
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
 		keys = set(d)
@@ -377,7 +377,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setdefault with different key, but same up to transformation, should preserve the first key")
 	
 	def test_setdefault_present_preserve_key_last(self):
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
 		keys = set(d)
@@ -385,7 +385,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setdefault with different key, but same up to transformation, should preserve the first key")
 	
 	def test_copy_method_preserve_key_first(self):
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 		d_copy = d.copy()
 		keys = set(d_copy)
 		
@@ -393,7 +393,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	
 	
 	def test_copy_method_preserve_key_last(self):
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 		d_copy = d.copy()
 		keys = set(d_copy)
 		
@@ -402,7 +402,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_copy_preserve_key_first(self):
 		import copy
 		
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 		d_copy = copy.copy(d)
 		keys = set(d_copy)
 		
@@ -411,7 +411,7 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_copy_preserve_key_last(self):
 		import copy
 		
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 		d_copy = copy.copy(d)
 		keys = set(d_copy)
 		
@@ -420,8 +420,8 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_deepcopy_preserve_key_first(self):
 		import copy
 		
-		d2 = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1_2: 2})
-		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: d2})
+		d2 = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1_2: 2})
+		d = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: d2})
 		d_copy = copy.deepcopy(d)
 		d2_copy = d_copy[self.KEY_UNTRANSFORMED_1]
 		
@@ -435,8 +435,8 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 	def test_deepcopy_preserve_key_last(self):
 		import copy
 		
-		d2 = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1_2: 2})
-		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: d2})
+		d2 = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1_2: 2})
+		d = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: d2})
 		d_copy = copy.deepcopy(d)
 		d2_copy = d_copy[self.KEY_UNTRANSFORMED_1]
 		
@@ -457,12 +457,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d3 = d1 | d2
 				keys = set(d3)
@@ -480,11 +480,11 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d3 = d1 | d2
 				keys = set(d3)
@@ -502,12 +502,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d3 = d2 | d1
 				keys = set(d3)
@@ -524,12 +524,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d3 = d2 | d1
 				keys = set(d3)
@@ -546,12 +546,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictFirstKey(source_dict),
+			LowercaseDictFirstKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d1 |= d2
 				keys = set(d1)
@@ -568,12 +568,12 @@ class TestLowercaseDictPreserve(unittest.TestCase):
 			collections.OrderedDict(source_dict),
 			collections.defaultdict(None, source_dict),
 			collections.UserDict(source_dict),
-			TestLowercaseDictLastKey(source_dict),
+			LowercaseDictLastKey(source_dict),
 		)
 		
 		for d2 in ds:
 			with self.subTest(type_=type(d2).__name__):
-				d1 = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
+				d1 = LowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 				
 				d1 |= d2
 				keys = set(d1)
