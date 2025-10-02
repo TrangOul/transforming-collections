@@ -8,7 +8,7 @@ from transforming_collections import KeyTransformingDict
 TestLowercaseDictFirstKey = KeyTransformingDict.create('TestLowercaseDictFirstKey', str.lower)
 TestLowercaseDictLastKey  = KeyTransformingDict.create('TestLowercaseDictFirstKey', str.lower, retain_first_key=False)
 
-class TestLowercaseDictFirstKeyBase(unittest.TestCase):
+class TestLowercaseDictPreserve(unittest.TestCase):
 	KEY_UNTRANSFORMED_1 = 'AbCαΒγАбВ'
 	KEY_UNTRANSFORMED_1_2 = 'aBcΑβΓаБв'
 	KEY_TRANSFORMED_1   = 'abcαβγабв'
@@ -38,7 +38,7 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
 		
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
-		source_dict = UppercaseKeyDict({key: 'value' for key in source_keys})
+		source_dict = TestUppercaseDict({key: 'value' for key in source_keys})
 		
 		d = TestLowercaseDictFirstKey(source_dict)
 		keys = set(d)
@@ -51,7 +51,7 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer, retain_first_key=False)
 		
 		source_keys = (self.KEY_UNTRANSFORMED_1, self.KEY_UNTRANSFORMED_1_2)
-		source_dict = UppercaseKeyDict({key: 'value' for key in source_keys})
+		source_dict = TestUppercaseDict({key: 'value' for key in source_keys})
 		
 		d = TestLowercaseDictLastKey(source_dict)
 		keys = set(d)
@@ -190,14 +190,10 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 	
 	def test_update_sibling_class_preserve_first_key(self):
 		transformer = str.upper
-		
-		class UppercaseKeyDict(TestLowercaseDictFirstKey.__bases__[0]):
-			@staticmethod
-			def transform_key(key):
-				return transformer(key)
+		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
 		
 		ld = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
-		ud = UppercaseKeyDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
+		ud = TestUppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
 		
 		ld.update(ud)
 		keys = set(ld)
@@ -206,14 +202,10 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 	
 	def test_update_sibling_class_preserve_last_key(self):
 		transformer = str.upper
-		
-		class UppercaseKeyDict(TestLowercaseDictFirstKey.__bases__[0]):
-			@staticmethod
-			def transform_key(key):
-				return transformer(key)
+		TestUppercaseDict = KeyTransformingDict.create('TestUppercaseDict', transformer)
 		
 		ld = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 'untransformed'})
-		ud = UppercaseKeyDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
+		ud = TestUppercaseDict({self.KEY_UNTRANSFORMED_1_2: 'untransformed2'})
 		
 		ld.update(ud)
 		keys = set(ld)
@@ -376,7 +368,7 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "setting a different key, but same up to transformation, should preserve the last key")
 	
-	def test_setdefault_present_preserve_first_key(self):
+	def test_setdefault_present_preserve_key_first(self):
 		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
@@ -384,13 +376,13 @@ class TestLowercaseDictFirstKeyBase(unittest.TestCase):
 		
 		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setdefault with different key, but same up to transformation, should preserve the first key")
 	
-	def test_setdefault_present_preserve_last_key(self):
+	def test_setdefault_present_preserve_key_last(self):
 		d = TestLowercaseDictLastKey({self.KEY_UNTRANSFORMED_1: 1})
 		
 		d.setdefault(self.KEY_UNTRANSFORMED_1_2)
 		keys = set(d)
 		
-		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1_2}, "setdefault with different key, but same up to transformation, should preserve the last key")
+		self.assertEqual(keys, {self.KEY_UNTRANSFORMED_1}, "setdefault with different key, but same up to transformation, should preserve the first key")
 	
 	def test_copy_method_preserve_key_first(self):
 		d = TestLowercaseDictFirstKey({self.KEY_UNTRANSFORMED_1: 1})

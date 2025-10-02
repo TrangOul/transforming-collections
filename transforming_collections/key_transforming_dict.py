@@ -117,7 +117,7 @@ class KeyTransformingDict(collections.UserDict):
 		return super().__getitem__(key)
 	
 	def _setitem_without_transform(self, transformed_key: object, original_key: object, value: object) -> None:
-		if not self._retain_first_key and transformed_key in self.data:
+		if self._retain_first_key and transformed_key in self.data:
 			original_key, dict_value = self._getitem_without_transform(transformed_key)
 		super().__setitem__(transformed_key, (original_key, value))
 	
